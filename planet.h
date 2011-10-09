@@ -1,18 +1,16 @@
 #ifndef PLANET_H
 #define PLANET_H
+
 #include <stdio.h>
 
-typedef double Float;
-#define FLOAT_SCANF_FORMAT "%lf"
-#define FLOAT_PRINTF_FORMAT "%g"
-
-typedef Float Vector[3];
+#include "vector.h"
 
 typedef struct Planet
 {
 	Float mass;
 	Vector position;
 	Vector velocity;
+	Vector acceleration[2]; // acceleration vector used varies with every other time step
 } Planet;
 
 typedef struct System

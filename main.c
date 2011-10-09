@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "simulate.h"
 #include "planet.h"
 
 void usage(const char* progname)
@@ -41,5 +42,5 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	print_system(outfile, system);
+	simulate(outfile, system);
 }

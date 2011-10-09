@@ -4,7 +4,7 @@ LINK=gcc
 
 LIBS=-lm
 EXE=planets
-OBJS=planet.o main.o
+OBJS=main.o planet.o simulate.o
 TEST_OBJS=foo.o
 
 $(EXE): $(OBJS)
@@ -12,7 +12,9 @@ $(EXE): $(OBJS)
 
 main.c: planet.h
 
-planet.c: planet.h
+planet.c: planet.h vector.h
+
+simulate.c: vector.h
 
 .PHONY: clean
 clean:
