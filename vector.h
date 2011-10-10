@@ -5,7 +5,7 @@
 
 typedef double Float;
 #define FLOAT_SCANF_FORMAT "%lf"
-#define FLOAT_PRINTF_FORMAT "%10.10g"
+#define FLOAT_PRINTF_FORMAT "%.10g"
 
 typedef Float Vector[3];
 

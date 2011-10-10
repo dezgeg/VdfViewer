@@ -5,17 +5,24 @@ LINK=gcc
 LIBS=-lm
 EXE=planets
 OBJS=main.o planet.o simulate.o
-TEST_OBJS=foo.o
+#TEST_OBJS=
 
 $(EXE): $(OBJS)
 	$(LINK) -o $(EXE) $(OBJS) $(LIBS)
 
-main.c: planet.h
-
-planet.c: planet.h vector.h
-
-simulate.c: vector.h
-
 .PHONY: clean
 clean:
-	rm -rf $(EXE) $(OBJS)
+	-rm -rf $(EXE) $(OBJS) *.d
+
+# Makefile autodependency crap generation
+# stolen from http://scottmcpeak.com/autodepend/autodepend.html
+-include $(OBJS:.o=.d)
+
+%.o: %.c
+	$(CC) -c $(CFLAGS) $*.c -o $*.o
+	$(CC) -MM $(CFLAGS) $*.c > $*.d
+	@cp -f $*.d $*.d.tmp
+	@sed -e 's/.*://' -e 's/\\$$//' < $*.d.tmp | fmt -1 | \
+	  sed -e 's/^ *//' -e 's/$$/:/' >> $*.d
+	@rm -f $*.d.tmp
+
