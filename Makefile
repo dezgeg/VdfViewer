@@ -1,11 +1,11 @@
-CC=gcc -std=c99 $(CFLAGS)
+CC=gcc -std=c99 -I. $(CFLAGS)
 CFLAGS=-O0 -g -Wall -Werror -pedantic
 LINK=gcc
 
 LIBS=-lm
 EXE=planets
 OBJS=main.o planet.o simulate.o
-GUI_OBJS=gui/gui.o gui/events.c
+GUI_OBJS=gui/gui.o gui/events.o
 #TEST_OBJS=
 
 $(EXE): $(OBJS)
@@ -16,7 +16,7 @@ glplanets: $(GUI_OBJS)
 
 .PHONY: clean
 clean:
-	-rm -rf $(EXE) $(OBJS) *.d
+	-rm -rf $(EXE) $(OBJS) $(GUI_OBJS) *.d
 
 # Makefile autodependency crap generation
 # stolen from http://scottmcpeak.com/autodepend/autodepend.html

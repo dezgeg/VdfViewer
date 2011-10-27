@@ -1,14 +1,21 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <SDL/SDL.h>
+#include <math.h>
+#include <stdbool.h>
 
+#include "vector.h"
 #include "events.h"
+
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
 
 struct State
 {
-	GLfloat x_pos, y_pos;
-	GLfloat x_rot, y_rot;
-} state = { 0.0, 0.0, 0.0, 0.0 };
+	Vector pos;
+	GLfloat rot_x, rot_y; /* rotation along screen x & y == world x & y */
+} state = { { 0.0, 0.0, 0.0 }, 0.0, 0.0 };
 
 void handle_keypress(const SDL_keysym *keysym)
 {
@@ -26,17 +33,40 @@ void handle_keypress(const SDL_keysym *keysym)
 }
 static void rotate(GLfloat x, GLfloat y)
 {
-	state.x_rot += x;
-	if(state.x_rot > 360.0)
-		state.x_rot -= 360.0;
-	else if(state.x_rot < 0.0)
-		state.x_rot += 360.0;
+	state.rot_x += x;
+	if(state.rot_x > 360.0)
+		state.rot_x -= 360.0;
+	else if(state.rot_x < 0.0)
+		state.rot_x += 360.0;
 
-	state.y_rot += y;
-	if(state.y_rot > 90.0)
-		state.y_rot = 90.0;
-	if(state.y_rot < -90.0)
-		state.y_rot = -90.0;
+	state.rot_y += y;
+	if(state.rot_y > 90.0)
+		state.rot_y = 90.0;
+	if(state.rot_y < -90.0)
+		state.rot_y = -90.0;
+}
+static void move(GLfloat amt, bool forward)
+{
+	const GLfloat DEG2RAD = M_PI / 180.0;
+	GLfloat cx = cos(state.rot_x * DEG2RAD);
+	GLfloat sx = sin(state.rot_x * DEG2RAD);
+	GLfloat cy = cos(state.rot_y * DEG2RAD);
+	GLfloat sy = sin(state.rot_y * DEG2RAD);
+
+	GLfloat dx = -sx * cy * amt;
+	GLfloat dy = sy * cx * amt;
+	GLfloat dz = cx * cy * amt;
+	if(forward)
+	{
+		state.pos[0] += dx;
+		state.pos[1] += dy;
+		state.pos[2] += dz;
+	}
+	else
+	{
+		state.pos[0] += cx * amt;
+		state.pos[2] += sx * amt;
+	}
 }
 static const GLfloat MOUSE_X_DELTA = 0.2;
 static const GLfloat MOUSE_Y_DELTA = 0.2;
@@ -60,13 +90,13 @@ void update(void)
 		rotate(0.0, ROT_DELTA);
 
 	if(keys[SDLK_a])
-			state.x_pos -= POS_DELTA;
+		move(-POS_DELTA, false);
 	if(keys[SDLK_e] || keys[SDLK_d])
-			state.x_pos += POS_DELTA;
+		move(POS_DELTA, false);
 	if(keys[SDLK_COMMA] || keys[SDLK_w])
-			state.y_pos -= POS_DELTA;
+		move(-POS_DELTA, true);
 	if(keys[SDLK_o] || keys[SDLK_s])
-			state.y_pos += POS_DELTA;
+		move(POS_DELTA, true);
 }
 
 void drawGLScene(void)
@@ -74,9 +104,9 @@ void drawGLScene(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	glRotatef(state.y_rot, 1.0, 0.0, 0.0);
-	glRotatef(state.x_rot, 0.0, 1.0, 0.0);
-	glTranslatef(-state.x_pos, 0, -state.y_pos);
+	glRotatef(state.rot_y, 1.0, 0.0, 0.0);
+	glRotatef(state.rot_x, 0.0, 1.0, 0.0);
+	glTranslatef(-state.pos[0], -state.pos[1], -state.pos[2]);
 	glPushMatrix();
 
 	glTranslatef(-1.5f, 0.0f, -6.0f);
