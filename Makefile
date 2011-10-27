@@ -5,10 +5,14 @@ LINK=gcc
 LIBS=-lm
 EXE=planets
 OBJS=main.o planet.o simulate.o
+GUI_OBJS=gui/gui.o gui/events.c
 #TEST_OBJS=
 
 $(EXE): $(OBJS)
 	$(LINK) -o $(EXE) $(OBJS) $(LIBS)
+
+glplanets: $(GUI_OBJS)
+	$(LINK) $(GUI_OBJS) -o glplanets -lGL -lGLU `sdl-config --cflags --libs`
 
 .PHONY: clean
 clean:
