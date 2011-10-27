@@ -142,42 +142,49 @@ void drawGLScene(void)
 	glEnd();                            /* Finished Drawing The Triangle */
 
 	glPopMatrix();
+	glPushMatrix();
 
 	glTranslatef(1.5f, 0.0f, -6.0f);
 
 	glColor3f(0.5f, 0.5f, 1.0f);
 
 	glBegin(GL_QUADS);                 /* Draw A Quad                      */
+	glNormal3f(0.0f, 1.0f, 0.0f);
 	glColor3f(  0.0f,  1.0f,  0.0f); /* Set The Color To Green           */
 	glVertex3f( 1.0f,  1.0f, -1.0f); /* Top Right Of The Quad (Top)      */
 	glVertex3f(-1.0f,  1.0f, -1.0f); /* Top Left Of The Quad (Top)       */
 	glVertex3f(-1.0f,  1.0f,  1.0f); /* Bottom Left Of The Quad (Top)    */
 	glVertex3f( 1.0f,  1.0f,  1.0f); /* Bottom Right Of The Quad (Top)   */
 
+	glNormal3f(0.0f, -1.0f, 0.0f);
 	glColor3f(  1.0f,  0.5f,  0.0f); /* Set The Color To Orange          */
 	glVertex3f( 1.0f, -1.0f,  1.0f); /* Top Right Of The Quad (Botm)     */
 	glVertex3f(-1.0f, -1.0f,  1.0f); /* Top Left Of The Quad (Botm)      */
 	glVertex3f(-1.0f, -1.0f, -1.0f); /* Bottom Left Of The Quad (Botm)   */
 	glVertex3f( 1.0f, -1.0f, -1.0f); /* Bottom Right Of The Quad (Botm)  */
 
+	glNormal3f(0.0f, 0.0f, 1.0f);
 	glColor3f(  1.0f,  0.0f,  0.0f); /* Set The Color To Red             */
 	glVertex3f( 1.0f,  1.0f,  1.0f); /* Top Right Of The Quad (Front)    */
 	glVertex3f(-1.0f,  1.0f,  1.0f); /* Top Left Of The Quad (Front)     */
 	glVertex3f(-1.0f, -1.0f,  1.0f); /* Bottom Left Of The Quad (Front)  */
 	glVertex3f( 1.0f, -1.0f,  1.0f); /* Bottom Right Of The Quad (Front) */
 
+	glNormal3f(0.0f, 0.0f, -1.0f);
 	glColor3f(  1.0f,  1.0f,  0.0f); /* Set The Color To Yellow          */
 	glVertex3f( 1.0f, -1.0f, -1.0f); /* Bottom Left Of The Quad (Back)   */
 	glVertex3f(-1.0f, -1.0f, -1.0f); /* Bottom Right Of The Quad (Back)  */
 	glVertex3f(-1.0f,  1.0f, -1.0f); /* Top Right Of The Quad (Back)     */
 	glVertex3f( 1.0f,  1.0f, -1.0f); /* Top Left Of The Quad (Back)      */
 
+	glNormal3f(-1.0f, 0.0f, 0.0f);
 	glColor3f(  0.0f,  0.0f,  1.0f); /* Set The Color To Blue            */
 	glVertex3f(-1.0f,  1.0f,  1.0f); /* Top Right Of The Quad (Left)     */
 	glVertex3f(-1.0f,  1.0f, -1.0f); /* Top Left Of The Quad (Left)      */
 	glVertex3f(-1.0f, -1.0f, -1.0f); /* Bottom Left Of The Quad (Left)   */
 	glVertex3f(-1.0f, -1.0f,  1.0f); /* Bottom Right Of The Quad (Left)  */
 
+	glNormal3f(1.0f, 0.0f, 0.0f);
 	glColor3f(  1.0f,  0.0f,  1.0f); /* Set The Color To Violet          */
 	glVertex3f( 1.0f,  1.0f, -1.0f); /* Top Right Of The Quad (Right)    */
 	glVertex3f( 1.0f,  1.0f,  1.0f); /* Top Left Of The Quad (Right)     */
@@ -185,5 +192,12 @@ void drawGLScene(void)
 	glVertex3f( 1.0f, -1.0f, -1.0f); /* Bottom Right Of The Quad (Right) */
 	glEnd();                            /* Done Drawing The Quad            */
 
+	glPopMatrix();
+	glTranslatef(0.0f, 2.0f, -6.0f);
+
+	GLUquadricObj* qo = gluNewQuadric();
+	glColor3f(1.0f, 0.0f, 0.0f);
+	gluSphere(qo, 1.0, 32, 32);
+	gluDeleteQuadric(qo);
 }
 

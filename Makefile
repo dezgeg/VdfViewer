@@ -3,16 +3,17 @@ CFLAGS=-O0 -g -Wall -Werror -pedantic
 LINK=gcc
 
 LIBS=-lm
+GUI_LIBS=-lm -lGL -lGLU `sdl-config --cflags --libs`
 EXE=planets
+GUI_EXE=glplanets
 OBJS=main.o planet.o simulate.o
 GUI_OBJS=gui/gui.o gui/events.o
-#TEST_OBJS=
 
 $(EXE): $(OBJS)
 	$(LINK) -o $(EXE) $(OBJS) $(LIBS)
 
-glplanets: $(GUI_OBJS)
-	$(LINK) $(GUI_OBJS) -o glplanets -lGL -lGLU `sdl-config --cflags --libs`
+$(GUI_EXE): $(GUI_OBJS)
+	$(LINK) $(GUI_OBJS) -o $(GUI_EXE) $(GUI_LIBS) 
 
 .PHONY: clean
 clean:
