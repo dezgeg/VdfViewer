@@ -80,8 +80,11 @@ int main(int argc, char **argv)
 	SDL_ShowCursor(0);
 	SDL_WM_GrabInput(SDL_GRAB_ON);
 
-	bool isActive = true;
 	SDL_Event event;
+	while(SDL_PollEvent(&event))
+		;  /* ignore spurious mouse events at startup */
+
+	bool isActive = true;
 	while (true)
 	{
 		Uint32 next_update = SDL_GetTicks() + FRAME_INTERVAL;

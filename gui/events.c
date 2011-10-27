@@ -10,8 +10,6 @@ struct State
 	GLfloat x_rot, y_rot;
 } state = { 0.0, 0.0, 0.0, 0.0 };
 
-static const GLfloat ROT_DELTA = 1.0;
-static const GLfloat POS_DELTA = 0.1;
 void handle_keypress(const SDL_keysym *keysym)
 {
 	switch (keysym->sym)
@@ -26,34 +24,48 @@ void handle_keypress(const SDL_keysym *keysym)
 			break;
 	}
 }
+static void rotate(GLfloat x, GLfloat y)
+{
+	state.x_rot += x;
+	if(state.x_rot > 360.0)
+		state.x_rot -= 360.0;
+	else if(state.x_rot < 0.0)
+		state.x_rot += 360.0;
+
+	state.y_rot += y;
+	if(state.y_rot > 90.0)
+		state.y_rot = 90.0;
+	if(state.y_rot < -90.0)
+		state.y_rot = -90.0;
+}
 static const GLfloat MOUSE_X_DELTA = 0.2;
 static const GLfloat MOUSE_Y_DELTA = 0.2;
 void handle_mouse(const SDL_MouseMotionEvent* mme)
 {
-	state.x_rot += mme->xrel * MOUSE_X_DELTA;
-	state.y_rot += mme->yrel * MOUSE_Y_DELTA;
+	rotate(mme->xrel * MOUSE_X_DELTA, mme->yrel * MOUSE_Y_DELTA);
 }
-
+static const GLfloat ROT_DELTA = 1.0;
+static const GLfloat POS_DELTA = 0.1;
 void update(void)
 {
 	Uint8* keys = SDL_GetKeyState(0);
 
 	if(keys[SDLK_LEFT])
-			state.x_rot -= ROT_DELTA;
+		rotate(-ROT_DELTA, 0.0);
 	if(keys[SDLK_RIGHT])
-			state.x_rot += ROT_DELTA;
+		rotate(ROT_DELTA, 0.0);
 	if(keys[SDLK_UP])
-			state.y_rot -= ROT_DELTA;
+		rotate(0.0, -ROT_DELTA);
 	if(keys[SDLK_DOWN])
-			state.y_rot += ROT_DELTA;
+		rotate(0.0, ROT_DELTA);
 
 	if(keys[SDLK_a])
 			state.x_pos -= POS_DELTA;
-	if(keys[SDLK_e])
+	if(keys[SDLK_e] || keys[SDLK_d])
 			state.x_pos += POS_DELTA;
-	if(keys[SDLK_COMMA])
+	if(keys[SDLK_COMMA] || keys[SDLK_w])
 			state.y_pos -= POS_DELTA;
-	if(keys[SDLK_o])
+	if(keys[SDLK_o] || keys[SDLK_s])
 			state.y_pos += POS_DELTA;
 }
 
