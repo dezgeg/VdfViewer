@@ -2,3 +2,7 @@ glplanets
 planets
 *.[aod]
 output/
+*.pdf
+*.aux
+*.log
+*.out

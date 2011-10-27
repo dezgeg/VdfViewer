@@ -1,0 +1,57 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage[english]{babel}
+\usepackage{hyperref}
+
+\title{Scientific Computing IIa - Planetary Motion Simulator}
+\author{Tuomas Tynkkynen}
+\date{\today}
+
+\begin{document}
+ \maketitle
+ \section{Description}
+ This program simulates the motion of arbitrary number of celestial objects using the Velocity Verlet\cite{VV} numerical integration method.
+  \subsection{Compiling}
+  Run \texttt{make} to compile and link the program.
+  The main executable program \texttt{planets} should then be created.
+
+  To use the included animation script, both ImageMagick and Octave has to be installed as well.
+ \section{Usage}
+  \subsection{Running}
+  \begin{center}
+  Usage: \texttt{planets \emph{infile} [\emph{outfile}]}\\
+  \end{center}
+  The planets program reads the initial parameters for the simulation from the file \emph{infile} and writes the results to \emph{outfile}.
+  If \emph{outfile} is omitted, the results are written to standard output instead.
+  \subsection{File formats}
+   The first line of the input file should be of the following format:
+   \begin{center}$n$ $L$ $\Delta t$ $N_\omega$\end{center}
+   where $n$ is the number of bodies; $L$ the duration of the simulation in seconds; $\Delta t$ the timestep of the simulation;
+   $N_\omega$ the number of iteration steps written to the output file
+   The following $n$ lines should contain
+   \begin{center}$m_i$ $s_{x_i}$ $s_{y_i}$ $s_{z_i}$ $v_{x_i}$ $v_{y_i}$ $v_{z_i}$\end{center}
+   where $m_i$ is the mass of the body $i$; $s_{x_i}$, $s_{y_i}$, $s_{z_i}$ the position of the body; 
+   $v_{x_i}$ $v_{y_i}$ $v_{z_i}$ the velocity of the body
+
+   The corresponding output file will contain $N_\omega$ lines of the form
+   \begin{center} $n$ $t$ $m_1$ $s_{x_1}$ $s_{y_1}$ $s_{z_1}$ $m_2$ $s_{x_2}$ $s_{y_2}$ $s_{z_2}$ $\cdots$ $m_n$ $s_{x_n}$ $s_{y_n}$ $s_{z_n}$\end{center}
+   where $n$ is the number of bodies; $t$ the time from the start of simulation; $m_i$; the mass of body $i$;
+   $s_{x_i}$ $s_{y_i}$ $s_{z_i}$ the position of body $i$.
+   \subsection{Creating an picture or animation of the results}
+   An utility script, \texttt{animate.sh} can be used to create an animation of the simulation results.
+   To create an animation, run \texttt{./animate.sh \emph{input-file} [\emph{-n}]}.
+   In addition to the output file, this will generate a GIF animation and a static PNG image of the simulation in the \texttt{output/} folder.
+   Use the \texttt{-n} parameter to skip creating the animation, since it usually takes a while.
+
+   For example, running \texttt{./animate.sh testfiles/earthsun.in} creates the files \texttt{output/earthsun.out},
+   \texttt{output/earthsun.gif}, \texttt{output/earthsun.png}.
+
+
+\begin{thebibliography}{9}
+\bibitem{VV} Wikipedia: Verlet integration -- \url{http://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet}
+\end{thebibliography}
+
+\end{document}
+
