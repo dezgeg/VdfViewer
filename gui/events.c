@@ -12,7 +12,7 @@ struct State
 
 static const GLfloat ROT_DELTA = 1.0;
 static const GLfloat POS_DELTA = 0.1;
-void handleKeyPress(const SDL_keysym *keysym)
+void handle_keypress(const SDL_keysym *keysym)
 {
 	switch (keysym->sym)
 	{
@@ -25,6 +25,13 @@ void handleKeyPress(const SDL_keysym *keysym)
 		default:
 			break;
 	}
+}
+static const GLfloat MOUSE_X_DELTA = 0.2;
+static const GLfloat MOUSE_Y_DELTA = 0.2;
+void handle_mouse(const SDL_MouseMotionEvent* mme)
+{
+	state.x_rot += mme->xrel * MOUSE_X_DELTA;
+	state.y_rot += mme->yrel * MOUSE_Y_DELTA;
 }
 
 void update(void)

@@ -77,6 +77,8 @@ int main(int argc, char **argv)
 
 	initGL();
 	resizeWindow(SCREEN_WIDTH, SCREEN_HEIGHT);
+	SDL_ShowCursor(0);
+	SDL_WM_GrabInput(SDL_GRAB_ON);
 
 	bool isActive = true;
 	SDL_Event event;
@@ -99,7 +101,10 @@ int main(int argc, char **argv)
 					resizeWindow(event.resize.w, event.resize.h);
 					break;
 				case SDL_KEYDOWN:
-					handleKeyPress(&event.key.keysym);
+					handle_keypress(&event.key.keysym);
+					break;
+				case SDL_MOUSEMOTION:
+					handle_mouse(&event.motion);
 					break;
 				case SDL_QUIT:
 					goto out;
