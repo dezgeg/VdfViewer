@@ -98,7 +98,40 @@ void update(void)
 	if(keys[SDLK_o] || keys[SDLK_s])
 		move(POS_DELTA, true);
 }
+void draw_grid(void)
+{
+	const GLfloat FAR_AWAY = 10000000.0f;
 
+	glLineWidth(3.0f);
+	glDisable(GL_LIGHTING);
+	glBegin(GL_LINES);
+
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(FAR_AWAY, 0.0f, 0.0f);
+
+	glColor3f(0.5f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(-FAR_AWAY, 0.0f, 0.0f);
+
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, FAR_AWAY, 0.0f);
+
+	glColor3f(0.0f, 0.5f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, -FAR_AWAY, 0.0f);
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, FAR_AWAY);
+
+	glColor3f(0.0f, 0.0f, 0.5f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, -FAR_AWAY);
+
+	glEnd();
+}
 void drawGLScene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -107,7 +140,9 @@ void drawGLScene(void)
 	glRotatef(state.rot_y, 1.0, 0.0, 0.0);
 	glRotatef(state.rot_x, 0.0, 1.0, 0.0);
 	glTranslatef(-state.pos[0], -state.pos[1], -state.pos[2]);
+
 	glPushMatrix();
+	glEnable(GL_LIGHTING);
 
 	glTranslatef(-1.5f, 0.0f, -6.0f);
 
@@ -193,11 +228,16 @@ void drawGLScene(void)
 	glEnd();                            /* Done Drawing The Quad            */
 
 	glPopMatrix();
+	glPushMatrix();
+
 	glTranslatef(0.0f, 2.0f, -6.0f);
 
 	GLUquadricObj* qo = gluNewQuadric();
 	glColor3f(1.0f, 1.0f, 1.0f);
 	gluSphere(qo, 1.0, 32, 32);
 	gluDeleteQuadric(qo);
+
+	glPopMatrix();
+	draw_grid();
 }
 

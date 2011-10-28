@@ -53,6 +53,15 @@ void initGL(GLvoid)
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_MULTISAMPLE);
+
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POLYGON_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 }
 void die(const char* message)
 {
@@ -70,18 +79,21 @@ int main(int argc, char **argv)
 	if(!videoInfo)
 		die("Could not get video information");
 
-	int videoFlags = SDL_OPENGL | SDL_GL_DOUBLEBUFFER | SDL_HWPALETTE | SDL_RESIZABLE;
-
+	int videoFlags = SDL_OPENGL | SDL_DOUBLEBUF | SDL_HWPALETTE | SDL_RESIZABLE;
+	videoFlags |= SDL_HWSURFACE | SDL_HWACCEL;
+	/*
 	if(videoInfo->hw_available)
 		videoFlags |= SDL_HWSURFACE;
 	else
 		videoFlags |= SDL_SWSURFACE;
 	if(videoInfo->blit_hw)
 		videoFlags |= SDL_HWACCEL;
+	*/
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	surface = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP,
-			videoFlags);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+	surface = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, videoFlags);
 
 	if(!surface)
 		die("Changing video mode failed");
@@ -130,6 +142,7 @@ int main(int argc, char **argv)
 		if(isActive)
 		{
 			drawGLScene();
+			glFlush();
 			SDL_GL_SwapBuffers();
 		}
 		Sint32 delta = next_update - SDL_GetTicks();
