@@ -42,5 +42,6 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
+	init_simulation(system);
 	simulate(outfile, system);
 }

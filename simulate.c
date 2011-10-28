@@ -31,17 +31,44 @@ static void update_accelerations(System* sys, int index)
 		vector_mul(sys->planets[i].acceleration[index], 1.0/sys->planets[i].mass, force);
 	}
 }
-
-void simulate(FILE* outfile, System* sys)
+void simulate_one_step(System* sys, int turn)
 {
 	int nplanets = sys->nplanets;
-	int nsteps = sys->nsteps;
-	int print_period = sys->print_period;
-
 	Float dt = sys->time_step;
 	Float half_dt = 0.5 * dt;
 	Float half_dt2 = 0.5 * dt * dt;
+	// 1. Update x: s(t + dt) = s(t) + v(t)*dt + 1/2 a(t)*dt^2
+	for(int j = 0; j < nplanets; j++)
+	{
+		Planet* planet = &sys->planets[j];
+		Vector* pos = &planet->position;
+		Vector temp;
+		vector_mul(temp, dt, planet->velocity);
+		vector_add(*pos, *pos, temp);
+		vector_mul(temp, half_dt2, planet->acceleration[turn % 2]);
+		vector_add(*pos, *pos, temp);
+	}
+	// 2. Calculate a(t + dt)
+	update_accelerations(sys, (turn + 1) % 2);
+	// 3. Calculate v(t + dt) = v(t) + 1/2 (a(t) + a(t + dt))*dt
+	for(int j = 0; j < nplanets; j++)
+	{
+		Planet* planet = &sys->planets[j];
+		Vector temp;
+		vector_add(temp, planet->acceleration[0], planet->acceleration[1]);
+		vector_mul(temp, half_dt, temp);
+		vector_add(planet->velocity, planet->velocity, temp);
+	}
+
+}
+void init_simulation(System* sys)
+{
 	update_accelerations(sys, 0); // set up initial accelerations
+}
+void simulate(FILE* outfile, System* sys)
+{
+	int nsteps = sys->nsteps;
+	int print_period = sys->print_period;
 
 	for(int i = 0; i < nsteps; i++)
 	{
@@ -51,27 +78,6 @@ void simulate(FILE* outfile, System* sys)
 			sys->cur_step = i;
 			print_system(outfile, sys);
 		}
-		// 1. Update x: s(t + dt) = s(t) + v(t)*dt + 1/2 a(t)*dt^2
-		for(int j = 0; j < nplanets; j++)
-		{
-			Planet* planet = &sys->planets[j];
-			Vector* pos = &planet->position;
-			Vector temp;
-			vector_mul(temp, dt, planet->velocity);
-			vector_add(*pos, *pos, temp);
-			vector_mul(temp, half_dt2, planet->acceleration[i % 2]);
-			vector_add(*pos, *pos, temp);
-		}
-		// 2. Calculate a(t + dt)
-		update_accelerations(sys, (i + 1) % 2);
-		// 3. Calculate v(t + dt) = v(t) + 1/2 (a(t) + a(t + dt))*dt
-		for(int j = 0; j < nplanets; j++)
-		{
-			Planet* planet = &sys->planets[j];
-			Vector temp;
-			vector_add(temp, planet->acceleration[0], planet->acceleration[1]);
-			vector_mul(temp, half_dt, temp);
-			vector_add(planet->velocity, planet->velocity, temp);
-		}
+		simulate_one_step(sys, i);
 	}
 }
