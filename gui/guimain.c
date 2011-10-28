@@ -5,7 +5,7 @@
 #include <GL/glu.h>
 #include <SDL/SDL.h>
 
-#include "events.h"
+#include "gui.h"
 
 #define SCREEN_WIDTH  640
 #define SCREEN_HEIGHT 480
@@ -14,7 +14,7 @@
 
 SDL_Surface *surface;
 
-int resizeWindow(int width, int height)
+static void resize_window(int width, int height)
 {
 	if(height == 0)
 		height = 1;
@@ -27,42 +27,9 @@ int resizeWindow(int width, int height)
 	gluPerspective(45.0f, ratio, 0.1f, 3000.0f);
 
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	return true;
 }
 
-void initGL(GLvoid)
-{
-	glShadeModel(GL_SMOOTH);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-	glClearDepth(1.0f);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-	const GLfloat ambient_light[] = { 0.1, 0.1, 0.1, 1.0 };
-	const GLfloat diffuse_light[] = { 0.8, 0.8, 0.8, 1.0 };
-	const GLfloat ambient_pos[] = { 0.0, 5.0, 1.0, 1.0 };
-	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient_light);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse_light);
-	glLightfv(GL_LIGHT1, GL_POSITION, ambient_pos);
-	glEnable(GL_LIGHT1);
-	glEnable(GL_COLOR_MATERIAL);
-	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_MULTISAMPLE);
-
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POLYGON_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-}
-void die(const char* message)
+static void die(const char* message)
 {
 	fprintf(stderr, "%s: %s\n", message, SDL_GetError());
 	exit(1);
@@ -71,7 +38,7 @@ void die(const char* message)
 int main(int argc, char **argv)
 {
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
-		die("Video initialization failed");
+		die("SDL initialization failed");
 	atexit(SDL_Quit);
 
 	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
@@ -95,8 +62,8 @@ int main(int argc, char **argv)
 	if(!surface)
 		die("Changing video mode failed");
 
-	initGL();
-	resizeWindow(SCREEN_WIDTH, SCREEN_HEIGHT);
+	init_gl();
+	resize_window(SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_ShowCursor(0);
 	SDL_WM_GrabInput(SDL_GRAB_ON);
 
@@ -104,7 +71,7 @@ int main(int argc, char **argv)
 	while(SDL_PollEvent(&event))
 		;  /* ignore spurious mouse events at startup */
 
-	bool isActive = true;
+	bool window_is_active = true;
 	while (true)
 	{
 		Uint32 next_update = SDL_GetTicks() + FRAME_INTERVAL;
@@ -113,7 +80,7 @@ int main(int argc, char **argv)
 			switch(event.type)
 			{
 				case SDL_ACTIVEEVENT:
-					isActive = event.active.gain;
+					window_is_active = event.active.gain;
 					break;			    
 				case SDL_VIDEORESIZE:
 					surface = SDL_SetVideoMode(event.resize.w,
@@ -121,7 +88,7 @@ int main(int argc, char **argv)
 							SCREEN_BPP, videoFlags);
 					if(!surface)
 						die("Lost video surface during resize");
-					resizeWindow(event.resize.w, event.resize.h);
+					resize_window(event.resize.w, event.resize.h);
 					break;
 				case SDL_KEYDOWN:
 					handle_keypress(&event.key.keysym);
@@ -136,9 +103,9 @@ int main(int argc, char **argv)
 			}
 		}
 		update();
-		if(isActive)
+		if(window_is_active)
 		{
-			drawGLScene();
+			draw_scene();
 			glFlush();
 			SDL_GL_SwapBuffers();
 		}
