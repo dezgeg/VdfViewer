@@ -53,8 +53,8 @@ static void move(GLfloat amt, bool forward)
 	GLfloat cy = cos(state.rot_y * DEG2RAD);
 	GLfloat sy = sin(state.rot_y * DEG2RAD);
 
-	GLfloat dx = -sx * cy * amt;
-	GLfloat dy = sy * cx * amt;
+	GLfloat dx = -cy * sx * amt;
+	GLfloat dy = sy * amt;
 	GLfloat dz = cx * cy * amt;
 	if(forward)
 	{
@@ -196,7 +196,7 @@ void drawGLScene(void)
 	glTranslatef(0.0f, 2.0f, -6.0f);
 
 	GLUquadricObj* qo = gluNewQuadric();
-	glColor3f(1.0f, 0.0f, 0.0f);
+	glColor3f(1.0f, 1.0f, 1.0f);
 	gluSphere(qo, 1.0, 32, 32);
 	gluDeleteQuadric(qo);
 }

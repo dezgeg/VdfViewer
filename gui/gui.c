@@ -43,13 +43,16 @@ void initGL(GLvoid)
 
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	const GLfloat ambient_light[] = { 0.5, 0.5, 0.5, 1.0 };
-	const GLfloat ambient_pos[] = { 0.0, 5.0, 0.0, 1.0 };
+	const GLfloat ambient_light[] = { 0.1, 0.1, 0.1, 1.0 };
+	const GLfloat diffuse_light[] = { 0.8, 0.8, 0.8, 1.0 };
+	const GLfloat ambient_pos[] = { 0.0, 5.0, 1.0, 1.0 };
 	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient_light);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, ambient_light);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse_light);
 	glLightfv(GL_LIGHT1, GL_POSITION, ambient_pos);
 	glEnable(GL_LIGHT1);
 	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
+	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 }
 void die(const char* message)
 {
