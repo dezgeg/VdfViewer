@@ -7,10 +7,14 @@
 #include "gui.h"
 
 #ifndef M_PI
-#define M_PI           3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
-GuiState state = { { 0.0, 0.0, 0.0 }, 0.0, 0.0 };
+GuiState state;
+static const GLfloat ROT_DELTA = 1.0;
+static const GLfloat POS_DELTA = 1.0e9;
+static const GLfloat MOUSE_X_DELTA = 0.2;
+static const GLfloat MOUSE_Y_DELTA = 0.2;
 
 void handle_keypress(const SDL_keysym *keysym)
 {
@@ -63,14 +67,10 @@ static void move(GLfloat amt, bool forward)
 		state.pos[2] += sx * amt;
 	}
 }
-static const GLfloat MOUSE_X_DELTA = 0.2;
-static const GLfloat MOUSE_Y_DELTA = 0.2;
 void handle_mouse(const SDL_MouseMotionEvent* mme)
 {
 	rotate(mme->xrel * MOUSE_X_DELTA, mme->yrel * MOUSE_Y_DELTA);
 }
-static const GLfloat ROT_DELTA = 1.0;
-static const GLfloat POS_DELTA = 0.1;
 void update(void)
 {
 	Uint8* keys = SDL_GetKeyState(0);

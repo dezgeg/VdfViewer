@@ -2,10 +2,12 @@
 #define GUI_EVENTS_H
 
 #include <SDL/SDL.h>
+#include "simulate.h"
 #include "vector.h"
 
 typedef struct GuiState
 {
+	System* sys;
 	Vector pos;
 	GLfloat rot_x, rot_y; /* rotation along screen x & y == world x & y */
 } GuiState;

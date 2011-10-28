@@ -24,29 +24,46 @@ static void resize_window(int width, int height)
 	glLoadIdentity();
 
 	GLfloat ratio = (GLfloat)width / (GLfloat)height;
-	gluPerspective(45.0f, ratio, 0.1f, 3000.0f);
+	gluPerspective(45.0f, ratio, 1.0e7f, 1.0e20f);
 
 	glMatrixMode(GL_MODELVIEW);
 }
-
 static void die(const char* message)
 {
 	fprintf(stderr, "%s: %s\n", message, SDL_GetError());
 	exit(1);
 }
-
-int main(int argc, char **argv)
+static void usage(const char* progname)
 {
+	fprintf(stderr, "usage: %s infile\n", progname);
+	exit(EXIT_FAILURE);
+}
+
+int main(int argc, char** argv)
+{
+	if(argc != 2)
+		usage(argv[0]);
+
+	FILE* infile = fopen(argv[1], "r");
+	if(infile == NULL)
+	{
+		perror("Error opening input file");
+		return EXIT_FAILURE;
+	}
+	System* sys = load_system(infile);
+	if(sys == NULL)
+	{
+		printf("Loading input file failed\n");
+		return EXIT_FAILURE;
+	}
+	init_simulation(sys);
+	state.sys = sys;
+
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 		die("SDL initialization failed");
 	atexit(SDL_Quit);
 
-	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
-	if(!videoInfo)
-		die("Could not get video information");
-
 	int videoFlags = SDL_OPENGL | SDL_HWPALETTE | SDL_RESIZABLE | SDL_HWSURFACE | SDL_HWACCEL;
-
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
@@ -58,7 +75,6 @@ int main(int argc, char **argv)
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 		surface = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, videoFlags);
 	}
-
 	if(!surface)
 		die("Changing video mode failed");
 
