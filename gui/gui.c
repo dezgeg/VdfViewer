@@ -24,7 +24,7 @@ int resizeWindow(int width, int height)
 	glLoadIdentity();
 
 	GLfloat ratio = (GLfloat)width / (GLfloat)height;
-	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+	gluPerspective(45.0f, ratio, 0.1f, 3000.0f);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -50,7 +50,6 @@ void initGL(GLvoid)
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse_light);
 	glLightfv(GL_LIGHT1, GL_POSITION, ambient_pos);
 	glEnable(GL_LIGHT1);
-	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
@@ -79,21 +78,19 @@ int main(int argc, char **argv)
 	if(!videoInfo)
 		die("Could not get video information");
 
-	int videoFlags = SDL_OPENGL | SDL_DOUBLEBUF | SDL_HWPALETTE | SDL_RESIZABLE;
-	videoFlags |= SDL_HWSURFACE | SDL_HWACCEL;
-	/*
-	if(videoInfo->hw_available)
-		videoFlags |= SDL_HWSURFACE;
-	else
-		videoFlags |= SDL_SWSURFACE;
-	if(videoInfo->blit_hw)
-		videoFlags |= SDL_HWACCEL;
-	*/
+	int videoFlags = SDL_OPENGL | SDL_HWPALETTE | SDL_RESIZABLE | SDL_HWSURFACE | SDL_HWACCEL;
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	surface = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, videoFlags);
+	if(!surface)
+	{
+		printf("Surface creation failed, trying to disable anti-aliasing...\n");
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+		surface = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, videoFlags);
+	}
 
 	if(!surface)
 		die("Changing video mode failed");

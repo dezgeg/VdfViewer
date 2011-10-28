@@ -100,7 +100,7 @@ void update(void)
 }
 void draw_grid(void)
 {
-	const GLfloat FAR_AWAY = 10000000.0f;
+	const GLfloat FAR_AWAY = 10000.0f;
 
 	glLineWidth(3.0f);
 	glDisable(GL_LIGHTING);
