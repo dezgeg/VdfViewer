@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include "vector.h"
+#include "constants.h"
 #include "gui.h"
 
 #ifndef M_PI
@@ -11,11 +12,26 @@
 #endif
 
 GuiState state;
-static const GLfloat ROT_DELTA = 1.0;
-static const GLfloat POS_DELTA = 5.0e8;
-static const GLfloat MOUSE_X_DELTA = 0.2;
-static const GLfloat MOUSE_Y_DELTA = 0.2;
-
+// return small, normal or large depending on keyboard modifier keys pressed
+static GLfloat get_modifier_value(GLfloat small, GLfloat normal, GLfloat large)
+{
+	SDLMod mod = SDL_GetModState();
+	bool alt = mod & (KMOD_LALT | KMOD_RALT);
+	bool shift = mod & (KMOD_LSHIFT | KMOD_RSHIFT);
+	if((!alt && !shift) || (alt && shift))
+		return normal;
+	else if(alt)
+		return large;
+	else
+		return small;
+}
+static void modify_setting(const char* name, GLfloat* setting, bool increment)
+{
+	*setting += (increment ? 1.0f : -1.0f) * get_modifier_value(0.1f, 1.0f, 10.0f);
+	if(*setting < 0.0f)
+		*setting = 0.0f;
+	printf("%s: %g\n", name, *setting);
+}
 void handle_keypress(const SDL_keysym *keysym)
 {
 	switch (keysym->sym)
@@ -24,12 +40,34 @@ void handle_keypress(const SDL_keysym *keysym)
 			exit(0);
 			break;
 		case SDLK_F1:
-			SDL_WM_ToggleFullScreen(surface);
+		case SDLK_F2:
+			modify_setting("Planet scale", &state.scale, keysym->sym == SDLK_F1);
+			break;
+		case SDLK_0:
+			if(state.locked_planet >= 0)
+			{
+				vector_add(state.pos, state.pos, state.sys->planets[state.locked_planet].position);
+				state.locked_planet = -1;
+			}
+		case SDLK_TAB:
+			state.pos[0] = 0.0f;
+			state.pos[1] = get_planet_radius(state.locked_planet >= 0 ? state.locked_planet : 0);
+			state.pos[2] = 0.0f;
 			break;
 		default:
 			break;
 	}
+	if(keysym->sym >= SDLK_1 && keysym->sym <= SDLK_9)
+	{
+		int planet = keysym->sym - SDLK_1;
+		if(planet >= state.sys->nplanets)
+			return;
+		state.locked_planet = planet;
+		vector_sub(state.pos, state.pos, state.sys->planets[planet].position);
+		printf("Locked on to planet %d\n", planet);
+	}
 }
+// Rotate the viewport by x, y (in screen coordinates) degrees
 static void rotate(GLfloat x, GLfloat y)
 {
 	state.rot_x += x;
@@ -44,6 +82,9 @@ static void rotate(GLfloat x, GLfloat y)
 	if(state.rot_y < -90.0)
 		state.rot_y = -90.0;
 }
+// Move the camera by amt units forward/backward (if forward == true) or left/right
+// The movement works similarly to noclip mode in FPSs
+// i.e. A/D keys (strafing) move on the XZ plane and W/S keys move in the camera direction
 static void move(GLfloat amt, bool forward)
 {
 	const GLfloat DEG2RAD = M_PI / 180.0;
@@ -74,6 +115,10 @@ void handle_mouse(const SDL_MouseMotionEvent* mme)
 void update(void)
 {
 	Uint8* keys = SDL_GetKeyState(0);
+	SDLMod mod = SDL_GetModState();
+	GLfloat pos_delta = POS_DELTA * (mod & (KMOD_LALT | KMOD_RALT) ? 10.0f :
+			mod & (KMOD_LSHIFT | KMOD_RSHIFT) ? 0.1f :
+			1.0f);
 
 	if(keys[SDLK_LEFT])
 		rotate(-ROT_DELTA, 0.0);
@@ -85,11 +130,11 @@ void update(void)
 		rotate(0.0, ROT_DELTA);
 
 	if(keys[SDLK_a])
-		move(-POS_DELTA, false);
+		move(-pos_delta, false);
 	if(keys[SDLK_e] || keys[SDLK_d])
-		move(POS_DELTA, false);
+		move(pos_delta, false);
 	if(keys[SDLK_COMMA] || keys[SDLK_w])
-		move(-POS_DELTA, true);
+		move(-pos_delta, true);
 	if(keys[SDLK_o] || keys[SDLK_s])
-		move(POS_DELTA, true);
+		move(pos_delta, true);
 }

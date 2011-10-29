@@ -2,6 +2,7 @@
 #include <GL/glu.h>
 #include <math.h>
 
+#include "constants.h"
 #include "planet.h"
 #include "gui.h"
 
@@ -9,8 +10,6 @@ static GLUquadricObj* sphere;
 
 static void draw_grid(void)
 {
-	const GLfloat FAR_AWAY = 1.5e11f;
-
 	glLineWidth(1.0f);
 	glDisable(GL_LIGHTING);
 	glBegin(GL_LINES);
@@ -43,7 +42,7 @@ static void draw_grid(void)
 }
 GLfloat get_planet_radius(int planet)
 {
-	return state.views[planet].radius;
+	return state.scale * state.views[planet].radius;
 }
 void draw_scene(void)
 {
@@ -52,24 +51,29 @@ void draw_scene(void)
 
 	glRotatef(state.rot_y, 1.0, 0.0, 0.0);
 	glRotatef(state.rot_x, 0.0, 1.0, 0.0);
-	glTranslatef(-state.pos[0], -state.pos[1], -state.pos[2]);
 
+	Vector pos_tmp;
+	vector_copy(pos_tmp, state.pos);
+	if(state.locked_planet >= 0)
+		vector_add(pos_tmp, pos_tmp, state.sys->planets[state.locked_planet].position);
+
+	glTranslatef(-pos_tmp[0], -pos_tmp[1], -pos_tmp[2]);
 	glPushMatrix();
-	glEnable(GL_LIGHTING);
 	for(int i = 0; i < state.sys->nplanets; i++)
 	{
-		if(i % 2)
-			glColor3f(0.0f, 1.0f, 1.0f);
-		else
-			glColor3f(1.0f, 0.0f, 1.0f);
+		glColor3f(1.0f, 1.0f, 1.0f);
 		Planet* planet = &state.sys->planets[i];
 		glTranslatef(planet->position[0], planet->position[1], planet->position[2]);
+		glScalef(state.scale, state.scale, state.scale);
+		glDisable(GL_LIGHTING);
+		glBegin(GL_POINTS);
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glEnd();
+		glEnable(GL_LIGHTING);
 		gluSphere(sphere, get_planet_radius(i), 32, 32);
-		printf("%g\n", get_planet_radius(i));
 		glPopMatrix();
 		glPushMatrix();
 	}
-	printf("%g %g %g\n", state.pos[0], state.pos[1], state.pos[2]);
 	draw_grid();
 	glPopMatrix();
 }
@@ -97,14 +101,15 @@ void init_gl(void)
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
-	/*
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	*/
 	glEnable(GL_MULTISAMPLE);
 
+	glEnable(GL_POINT_SMOOTH);
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_POLYGON_SMOOTH);
+	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+	glPointSize(3.0f);
 }

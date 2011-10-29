@@ -2,6 +2,7 @@
 #define VECTOR_H
 
 #include <math.h>
+#include <string.h>
 
 typedef double Float;
 #define FLOAT_SCANF_FORMAT "%lf"
@@ -30,6 +31,10 @@ static inline void vector_sub(Vector dest, const Vector v1, const Vector v2)
 {
 	for(int i = 0; i < 3; i++)
 		dest[i] = v1[i] - v2[i];
+}
+static inline void vector_copy(Vector dest, const Vector src)
+{
+	memcpy(dest, src, sizeof(Vector));
 }
 
 #endif

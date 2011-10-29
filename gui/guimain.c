@@ -59,6 +59,8 @@ int main(int argc, char** argv)
 		state.views[i].radius = pow(sys->planets[i].mass / DENSITY, 1.0f/3.0f);
 	state.pos[1] = get_planet_radius(0);
 	state.rot_x = 90.0f;
+	state.scale = 1.0f;
+	state.locked_planet = -1;
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 		die("SDL initialization failed");
@@ -66,19 +68,8 @@ int main(int argc, char** argv)
 	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
 	if(!videoInfo)
 		die("Could not get video information");
-//	int videoFlags = SDL_OPENGL | SDL_HWPALETTE | SDL_RESIZABLE;
 	int videoFlags = SDL_OPENGL | SDL_HWPALETTE | SDL_RESIZABLE | SDL_HWSURFACE | SDL_HWACCEL;
 
-	/*
-	if(videoInfo->hw_available)
-		videoFlags |= SDL_HWSURFACE;
-	else
-		videoFlags |= SDL_SWSURFACE;
-	if(videoInfo->blit_hw)
-		videoFlags |= SDL_HWACCEL;
-		*/
-
-	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
@@ -103,6 +94,7 @@ int main(int argc, char** argv)
 		;  /* ignore spurious mouse events at startup */
 
 	bool window_is_active = true;
+	int step = 0;
 	while (true)
 	{
 		Uint32 next_update = SDL_GetTicks() + FRAME_INTERVAL;
@@ -140,6 +132,8 @@ int main(int argc, char** argv)
 			glFlush();
 			SDL_GL_SwapBuffers();
 		}
+		for(int i = 0; i < 1000; i++)
+			simulate_one_step(sys, step++);
 		Sint32 delta = next_update - SDL_GetTicks();
 		if(delta > 0)
 			SDL_Delay(delta);

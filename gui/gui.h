@@ -15,6 +15,8 @@ typedef struct GuiState
 	PlanetView* views;
 	Vector pos;
 	GLfloat rot_x, rot_y; /* rotation along screen x & y == world x & y */
+	GLfloat scale;
+	int locked_planet;
 } GuiState;
 
 // events.c
