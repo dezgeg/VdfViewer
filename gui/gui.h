@@ -5,9 +5,14 @@
 #include "simulate.h"
 #include "vector.h"
 
+typedef struct PlanetView
+{
+	GLfloat radius;
+} PlanetView;
 typedef struct GuiState
 {
 	System* sys;
+	PlanetView* views;
 	Vector pos;
 	GLfloat rot_x, rot_y; /* rotation along screen x & y == world x & y */
 } GuiState;
@@ -20,6 +25,7 @@ extern void update(void);
 // draw.c
 extern void init_gl(void);
 extern void draw_scene(void);
+extern GLfloat get_planet_radius(int planet);
 // guimain.c
 extern SDL_Surface* surface;
 #endif

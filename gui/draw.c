@@ -1,5 +1,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <math.h>
 
 #include "planet.h"
 #include "gui.h"
@@ -8,9 +9,9 @@ static GLUquadricObj* sphere;
 
 static void draw_grid(void)
 {
-	const GLfloat FAR_AWAY = 1.0e15f;
+	const GLfloat FAR_AWAY = 1.5e11f;
 
-	glLineWidth(3.0f);
+	glLineWidth(1.0f);
 	glDisable(GL_LIGHTING);
 	glBegin(GL_LINES);
 
@@ -40,6 +41,10 @@ static void draw_grid(void)
 
 	glEnd();
 }
+GLfloat get_planet_radius(int planet)
+{
+	return state.views[planet].radius;
+}
 void draw_scene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -53,13 +58,18 @@ void draw_scene(void)
 	glEnable(GL_LIGHTING);
 	for(int i = 0; i < state.sys->nplanets; i++)
 	{
+		if(i % 2)
+			glColor3f(0.0f, 1.0f, 1.0f);
+		else
+			glColor3f(1.0f, 0.0f, 1.0f);
 		Planet* planet = &state.sys->planets[i];
 		glTranslatef(planet->position[0], planet->position[1], planet->position[2]);
-		gluSphere(sphere, 0.7e9f, 32, 32);
+		gluSphere(sphere, get_planet_radius(i), 32, 32);
+		printf("%g\n", get_planet_radius(i));
 		glPopMatrix();
 		glPushMatrix();
 	}
-
+	printf("%g %g %g\n", state.pos[0], state.pos[1], state.pos[2]);
 	draw_grid();
 	glPopMatrix();
 }
@@ -87,8 +97,10 @@ void init_gl(void)
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
+	/*
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	*/
 	glEnable(GL_MULTISAMPLE);
 
 	glEnable(GL_LINE_SMOOTH);

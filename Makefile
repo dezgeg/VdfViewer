@@ -19,7 +19,7 @@ $(GUI_EXE): $(GUI_OBJS)
 
 .PHONY: clean
 clean:
-	-rm -rf $(EXE) $(OBJS) $(GUI_OBJS) *.d
+	-rm -rf $(EXE) $(OBJS) $(GUI_OBJS) *.d gui/*.d
 
 # Makefile autodependency crap generation
 # stolen from http://scottmcpeak.com/autodepend/autodepend.html

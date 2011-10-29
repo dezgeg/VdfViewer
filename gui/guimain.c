@@ -6,11 +6,7 @@
 #include <SDL/SDL.h>
 
 #include "gui.h"
-
-#define SCREEN_WIDTH  640
-#define SCREEN_HEIGHT 480
-#define SCREEN_BPP     16
-#define FRAME_INTERVAL 30
+#include "constants.h"
 
 SDL_Surface *surface;
 
@@ -24,7 +20,7 @@ static void resize_window(int width, int height)
 	glLoadIdentity();
 
 	GLfloat ratio = (GLfloat)width / (GLfloat)height;
-	gluPerspective(45.0f, ratio, 1.0e7f, 1.0e20f);
+	gluPerspective(FOV, ratio, NEAR_PLANE, FAR_PLANE);
 
 	glMatrixMode(GL_MODELVIEW);
 }
@@ -58,12 +54,31 @@ int main(int argc, char** argv)
 	}
 	init_simulation(sys);
 	state.sys = sys;
+	state.views = malloc(sys->nplanets * sizeof(PlanetView));
+	for(int i = 0; i < sys->nplanets; i++)
+		state.views[i].radius = pow(sys->planets[i].mass / DENSITY, 1.0f/3.0f);
+	state.pos[1] = get_planet_radius(0);
+	state.rot_x = 90.0f;
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 		die("SDL initialization failed");
 	atexit(SDL_Quit);
-
+	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
+	if(!videoInfo)
+		die("Could not get video information");
+//	int videoFlags = SDL_OPENGL | SDL_HWPALETTE | SDL_RESIZABLE;
 	int videoFlags = SDL_OPENGL | SDL_HWPALETTE | SDL_RESIZABLE | SDL_HWSURFACE | SDL_HWACCEL;
+
+	/*
+	if(videoInfo->hw_available)
+		videoFlags |= SDL_HWSURFACE;
+	else
+		videoFlags |= SDL_SWSURFACE;
+	if(videoInfo->blit_hw)
+		videoFlags |= SDL_HWACCEL;
+		*/
+
+	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);

@@ -12,7 +12,7 @@
 
 GuiState state;
 static const GLfloat ROT_DELTA = 1.0;
-static const GLfloat POS_DELTA = 1.0e9;
+static const GLfloat POS_DELTA = 5.0e8;
 static const GLfloat MOUSE_X_DELTA = 0.2;
 static const GLfloat MOUSE_Y_DELTA = 0.2;
 
