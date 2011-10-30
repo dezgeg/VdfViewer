@@ -31,10 +31,10 @@ static void update_accelerations(System* sys, int index)
 		vector_mul(sys->planets[i].acceleration[index], 1.0/sys->planets[i].mass, force);
 	}
 }
-void simulate_one_step(System* sys, int turn)
+void simulate_one_step(System* sys, int turn, Float time_step)
 {
 	int nplanets = sys->nplanets;
-	Float dt = sys->time_step;
+	Float dt = time_step;
 	Float half_dt = 0.5 * dt;
 	Float half_dt2 = 0.5 * dt * dt;
 	// 1. Update x: s(t + dt) = s(t) + v(t)*dt + 1/2 a(t)*dt^2
@@ -78,6 +78,6 @@ void simulate(FILE* outfile, System* sys)
 			sys->cur_step = i;
 			print_system(outfile, sys);
 		}
-		simulate_one_step(sys, i);
+		simulate_one_step(sys, i, sys->time_step);
 	}
 }

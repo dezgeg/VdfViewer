@@ -39,9 +39,17 @@ void handle_keypress(const SDL_keysym *keysym)
 		case SDLK_ESCAPE:
 			exit(0);
 			break;
+		case SDLK_p:
+			state.paused = !state.paused;
+			printf("Simulation %s\n", state.paused ? "paused" : "unpaused");
+			break;
 		case SDLK_F1:
 		case SDLK_F2:
 			modify_setting("Planet scale", &state.scale, keysym->sym == SDLK_F1);
+			break;
+		case SDLK_F3:
+		case SDLK_F4:
+			modify_setting("Simulation speed (earth hours/sec)", &state.hours_per_sec, keysym->sym == SDLK_F3);
 			break;
 		case SDLK_0:
 			if(state.locked_planet >= 0)
@@ -54,6 +62,12 @@ void handle_keypress(const SDL_keysym *keysym)
 			state.pos[1] = get_planet_radius(state.locked_planet >= 0 ? state.locked_planet : 0);
 			state.pos[2] = 0.0f;
 			break;
+			/*
+		case SDLK_F12:
+			state.orthographic = !state.orthographic;
+			init_viewport();
+			break;
+			*/
 		default:
 			break;
 	}

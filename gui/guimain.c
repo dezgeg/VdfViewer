@@ -10,16 +10,17 @@
 
 SDL_Surface *surface;
 
-static void resize_window(int width, int height)
+void init_viewport(void)
 {
-	if(height == 0)
-		height = 1;
-
-	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
+	glViewport(0, 0, (GLsizei)surface->w, (GLsizei)surface->h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	GLfloat ratio = (GLfloat)width / (GLfloat)height;
+	/*
+	if(state.orthographic)
+		glOrtho(0.0f, surface->w, 0.0f, surface->h, NEAR_PLANE, FAR_PLANE);
+	*/
+	GLfloat ratio = (GLfloat)surface->w / (GLfloat)surface->h;
 	gluPerspective(FOV, ratio, NEAR_PLANE, FAR_PLANE);
 
 	glMatrixMode(GL_MODELVIEW);
@@ -61,6 +62,9 @@ int main(int argc, char** argv)
 	state.rot_x = 90.0f;
 	state.scale = 1.0f;
 	state.locked_planet = -1;
+	state.hours_per_sec = 24.0f;
+	state.time_step = 600;
+	state.paused = true;
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 		die("SDL initialization failed");
@@ -85,7 +89,7 @@ int main(int argc, char** argv)
 		die("Changing video mode failed");
 
 	init_gl();
-	resize_window(SCREEN_WIDTH, SCREEN_HEIGHT);
+	init_viewport();
 	SDL_ShowCursor(0);
 	SDL_WM_GrabInput(SDL_GRAB_ON);
 
@@ -111,7 +115,7 @@ int main(int argc, char** argv)
 							SCREEN_BPP, videoFlags);
 					if(!surface)
 						die("Lost video surface during resize");
-					resize_window(event.resize.w, event.resize.h);
+					init_viewport();
 					break;
 				case SDL_KEYDOWN:
 					handle_keypress(&event.key.keysym);
@@ -132,8 +136,11 @@ int main(int argc, char** argv)
 			glFlush();
 			SDL_GL_SwapBuffers();
 		}
-		for(int i = 0; i < 1000; i++)
-			simulate_one_step(sys, step++);
+		if(!state.paused)
+		{
+			for(int i = 0; i < (state.hours_per_sec * 3600.0f / FRAME_INTERVAL) / state.time_step; i++)
+				simulate_one_step(sys, step++, state.time_step);
+		}
 		Sint32 delta = next_update - SDL_GetTicks();
 		if(delta > 0)
 			SDL_Delay(delta);

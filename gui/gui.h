@@ -2,6 +2,7 @@
 #define GUI_EVENTS_H
 
 #include <SDL/SDL.h>
+#include <stdbool.h>
 #include "simulate.h"
 #include "vector.h"
 
@@ -17,6 +18,9 @@ typedef struct GuiState
 	GLfloat rot_x, rot_y; /* rotation along screen x & y == world x & y */
 	GLfloat scale;
 	int locked_planet;
+	GLfloat hours_per_sec;
+	GLfloat time_step;
+	bool paused;
 } GuiState;
 
 // events.c
@@ -29,5 +33,6 @@ extern void init_gl(void);
 extern void draw_scene(void);
 extern GLfloat get_planet_radius(int planet);
 // guimain.c
+extern void init_viewport(void);
 extern SDL_Surface* surface;
 #endif
