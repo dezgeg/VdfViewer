@@ -31,6 +31,7 @@ int main(int argc, char** argv)
 	FILE* infile = fopen(argv[1], "r");
 	if(infile == NULL)
 	{
+		fclose(outfile);
 		perror("Error opening input file");
 		return EXIT_FAILURE;
 	}
@@ -38,10 +39,15 @@ int main(int argc, char** argv)
 	System* system = load_system(infile);
 	if(system == NULL)
 	{
+		fclose(outfile);
+		fclose(infile);
 		printf("Loading input file failed.\n");
 		return EXIT_FAILURE;
 	}
 
 	init_simulation(system);
 	simulate(outfile, system);
+	free(system);
+	fclose(outfile);
+	fclose(infile);
 }
