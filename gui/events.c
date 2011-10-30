@@ -8,18 +8,18 @@
 #include "gui.h"
 
 GuiState state;
-// return small, normal or large depending on keyboard modifier keys pressed
-static GLfloat get_modifier_value(GLfloat small, GLfloat normal, GLfloat large)
+// return shift_val, normal_val or alt_val depending on keyboard modifier keys pressed
+static GLfloat get_modifier_value(GLfloat shift_val, GLfloat normal_val, GLfloat alt_val)
 {
 	SDLMod mod = SDL_GetModState();
 	bool alt = mod & (KMOD_LALT | KMOD_RALT);
 	bool shift = mod & (KMOD_LSHIFT | KMOD_RSHIFT);
 	if((!alt && !shift) || (alt && shift))
-		return normal;
+		return normal_val;
 	else if(alt)
-		return large;
+		return alt_val;
 	else
-		return small;
+		return shift_val;
 }
 static void modify_setting(const char* name, GLfloat* setting, bool increment)
 {
@@ -69,10 +69,18 @@ void handle_keypress(const SDL_keysym *keysym)
 			printf("Movement set to free-moving\n");
 			break;
 		case SDLK_TAB:
-			state.pos[0] = 0.0f;
-			state.pos[1] = get_planet_radius(state.locked_planet >= 0 ? state.locked_planet : 0);
-			state.pos[2] = 0.0f;
-			break;
+			{
+				int planet = state.locked_planet;
+				if(planet == -1)
+				{
+					planet = 0;
+					vector_copy(state.pos, state.sys->planets[planet].position);
+				}
+				else
+					state.pos[0] = state.pos[1] = state.pos[2] = 0.0f;
+				state.pos[1] += 1.1f * get_planet_radius(planet);
+				break;
+			}
 			/*
 		case SDLK_F12:
 			state.orthographic = !state.orthographic;
@@ -141,10 +149,7 @@ void handle_mouse(const SDL_MouseMotionEvent* mme)
 void update(void)
 {
 	Uint8* keys = SDL_GetKeyState(0);
-	SDLMod mod = SDL_GetModState();
-	GLfloat pos_delta = POS_DELTA * (mod & (KMOD_LALT | KMOD_RALT) ? 10.0f :
-			mod & (KMOD_LSHIFT | KMOD_RSHIFT) ? 0.1f :
-			1.0f);
+	GLfloat pos_delta = get_modifier_value(0.1f, 0.3f, 10.0f) * POS_DELTA;
 
 	if(keys[SDLK_LEFT])
 		rotate(-ROT_DELTA, 0.0);

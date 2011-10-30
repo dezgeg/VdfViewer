@@ -17,9 +17,9 @@ typedef struct System
 {
 	Float time_step;
 	int nplanets;
-	int cur_step;
-	int nsteps;
-	int print_period; // print system state every N time steps
+	long long cur_step;
+	long long nsteps;
+	long long print_period; // print system state every N time steps
 	Planet planets[];
 } System;
 

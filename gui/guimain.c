@@ -69,9 +69,12 @@ int main(int argc, char** argv)
 	state.views = malloc(sys->nplanets * sizeof(PlanetView));
 	for(int i = 0; i < sys->nplanets; i++)
 		state.views[i].radius = pow(sys->planets[i].mass / DENSITY, 1.0f/3.0f);
-	state.pos[1] = get_planet_radius(0);
-	state.rot_x = 90.0f;
 	state.scale = 1.0f;
+	Vector* fst_pos = &sys->planets[0].position;
+	vector_copy(state.pos, *fst_pos);
+	state.pos[1] += 1.1f*get_planet_radius(0);
+	state.pos[0] -= get_planet_radius(0);
+	state.rot_x = 90.0f;
 	state.locked_planet = -1;
 	state.hours_per_sec = 24.0f;
 	state.time_step = 600;

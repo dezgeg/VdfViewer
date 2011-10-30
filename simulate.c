@@ -67,8 +67,8 @@ void init_simulation(System* sys)
 }
 void simulate(FILE* outfile, System* sys)
 {
-	int nsteps = sys->nsteps;
-	int print_period = sys->print_period;
+	long long nsteps = sys->nsteps;
+	long long print_period = sys->print_period;
 
 	for(int i = 0; i < nsteps; i++)
 	{

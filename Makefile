@@ -1,5 +1,5 @@
 CC=gcc -std=c99 -I. $(CFLAGS)
-CFLAGS=-O0 -g -Wall -Werror -pedantic
+CFLAGS=-O3 -g -Wall -pedantic
 LINK=gcc
 
 LIBS=-lm
