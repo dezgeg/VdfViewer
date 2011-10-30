@@ -14,7 +14,7 @@
  \section{Description}
  This program simulates the motion of arbitrary number of celestial objects using the Velocity Verlet\cite{VV} numerical integration method.
  The results of the simulation can then be visualized as an animated or static graph.
- Also, a separate program is included for an interactive 3d view of the simulation.
+ Also, a separate program is included for an interactive 3d view of the simulation, created mostly for my own learning.
   \subsection{Compiling}
   Run \texttt{make} to compile and link the program.
   The main executable program \texttt{planets} should then be created.
@@ -34,7 +34,8 @@
    The first line of the input file should be of the following format:
    \begin{center}$n$ $L$ $\Delta t$ $N_\omega$\end{center}
    where $n$ is the number of bodies; $L$ the duration of the simulation in seconds; $\Delta t$ the timestep of the simulation;
-   $N_\omega$ the number of iteration steps written to the output file
+   $N_\omega$ the number of iteration steps written to the output file.
+
    The following $n$ lines should contain definitions of the planets in the following format:
    \begin{center}$m_i$ $s_{x_i}$ $s_{y_i}$ $s_{z_i}$ $v_{x_i}$ $v_{y_i}$ $v_{z_i}$\end{center}
    where $m_i$ is the mass of the body $i$ in kilograms; $s_{x_i}$, $s_{y_i}$, $s_{z_i}$ the x,y,z coordinates of the position of the body in meters; 
@@ -93,7 +94,7 @@
    Pressing Tab will teleport you back where you started.
    You can see the green dotted line which shows the path of Earth.
    \section{Analysis of results}
-   \subsection{1. Jupiter}
+   \subsection{Jupiter}
    Timesteps of $10^n$ s for $n \in [0; 7]$ were tried. $n = 0$ gave just nonsense, and $n = 1$ still seemed a bit too small, and $n = 7$ is too large.
    Between $10^2$ seconds and $10^6$ seconds the time step didn't see to matter too much, so $10^4$ seconds was chosen.
 
@@ -102,7 +103,15 @@
    Using the same time step, after the actual orbital period, the simulated Jupiter has moved about $2.93 \times 10^6$ km ahead.
    The Sun's orbital period seems to be about one half of Jupiter's period.
    It seems to ``orbit'' a ``half-ellipse''-shaped path, with the semi-minor axis of $ 28 \times 10^6 $ km and semi-major axis of $ 46 \times 10^6$ km.
+   \subsection{Human timespans}
+   Using a simulation with the Earth and the Sun, the Earth's orbital period (a.k.a a year) is about 365 days and 1.7 hours with a time step of 600 seconds.
+   Using a time step of 60 seconds, the orbital period of Moon around Earth (i.e. a month) was approximately 26 days 18.3 hours.
+   \subsection{Multiple bodies}
+   A simple model of Sun, Earth and Moon stayed stable for at least few dozen Earth's orbital periods,
+   but lost its stability after periods several magnitudes longer, though it is quite possible that too large time step was being
+   used at that time so that the computation wouldn't take too long.
 
+   A stable triple star system was not able to be created.
    \begin{thebibliography}{9}
 \bibitem{VV} Wikipedia: Verlet integration -- \url{http://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet}
 \end{thebibliography}
