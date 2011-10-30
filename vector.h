@@ -4,8 +4,8 @@
 #include <math.h>
 #include <string.h>
 
-typedef double Float;
-#define FLOAT_SCANF_FORMAT "%lf"
+typedef float Float;
+#define FLOAT_SCANF_FORMAT "%f"
 #define FLOAT_PRINTF_FORMAT "%.10g"
 
 typedef Float Vector[3];
@@ -35,6 +35,12 @@ static inline void vector_sub(Vector dest, const Vector v1, const Vector v2)
 static inline void vector_copy(Vector dest, const Vector src)
 {
 	memcpy(dest, src, sizeof(Vector));
+}
+static inline void vector_normalize(Vector dest, const Vector vec)
+{
+	Float length = sqrt(vector_lengthsq(vec));
+	for(int i = 0; i < 3; i++)
+		dest[i] = vec[i] / length;
 }
 
 #endif

@@ -3,12 +3,18 @@
 
 #include <SDL/SDL.h>
 #include <stdbool.h>
+#include "constants.h"
 #include "simulate.h"
 #include "vector.h"
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 typedef struct PlanetView
 {
 	GLfloat radius;
+	Vector trails[MAX_TRAILS];
 } PlanetView;
 typedef struct GuiState
 {
@@ -21,6 +27,9 @@ typedef struct GuiState
 	GLfloat hours_per_sec;
 	GLfloat time_step;
 	bool paused;
+	int first_trail;
+	int num_trails;
+	bool trails_enabled;
 } GuiState;
 
 // events.c

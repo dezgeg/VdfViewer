@@ -35,6 +35,17 @@ static void usage(const char* progname)
 	fprintf(stderr, "usage: %s infile\n", progname);
 	exit(EXIT_FAILURE);
 }
+static void update_trails(void)
+{
+	int trail_index = (state.first_trail + state.num_trails) % MAX_TRAILS;
+	for(int i = 0; i < state.sys->nplanets; i++)
+		vector_copy(state.views[i].trails[trail_index], state.sys->planets[i].position);
+
+	if(state.num_trails == MAX_TRAILS)
+		state.first_trail++;
+	else
+		state.num_trails++;
+}
 
 int main(int argc, char** argv)
 {
@@ -65,6 +76,7 @@ int main(int argc, char** argv)
 	state.hours_per_sec = 24.0f;
 	state.time_step = 600;
 	state.paused = true;
+	state.trails_enabled = true;
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 		die("SDL initialization failed");
@@ -139,7 +151,11 @@ int main(int argc, char** argv)
 		if(!state.paused)
 		{
 			for(int i = 0; i < (state.hours_per_sec * 3600.0f / FRAME_INTERVAL) / state.time_step; i++)
+			{
+				if((step % TRAILS_INTERVAL) == 0)
+					update_trails();
 				simulate_one_step(sys, step++, state.time_step);
+			}
 		}
 		Sint32 delta = next_update - SDL_GetTicks();
 		if(delta > 0)

@@ -6,6 +6,8 @@
 #define SCREEN_HEIGHT 480
 #define SCREEN_BPP     16
 #define FRAME_INTERVAL 30
+#define MAX_TRAILS 8192
+#define TRAILS_INTERVAL 30
 
 #define FOV 45.0f
 #define NEAR_PLANE 1.0e5f
@@ -14,9 +16,9 @@
 
 #define FAR_AWAY 1.5e11f // axis endpoint coordinate
 
-#define ROT_DELTA 1.0 // Viewport angle changed by up/down/left/right keys in degress
+#define ROT_DELTA 2.0 // Viewport angle changed by up/down/left/right keys in degress
 #define POS_DELTA 5.0e7 // Amount moved each frame by the WASD keys
-#define MOUSE_X_DELTA 0.2
-#define MOUSE_Y_DELTA 0.2
+#define MOUSE_X_DELTA 0.10
+#define MOUSE_Y_DELTA 0.10
 
 #endif
