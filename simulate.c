@@ -5,6 +5,7 @@
 
 static const double GAMMA = 6.674e-11;
 
+/* calculate acceleration at the current system state, into acceleration index index */
 static void update_accelerations(System* sys, int index)
 {
 	for(int i = 0; i < sys->nplanets; i++)
@@ -31,6 +32,7 @@ static void update_accelerations(System* sys, int index)
 		vector_mul(sys->planets[i].acceleration[index], 1.0/sys->planets[i].mass, force);
 	}
 }
+/* perform one simulation step with time step time_step */
 void simulate_one_step(System* sys, int turn, Float time_step)
 {
 	int nplanets = sys->nplanets;
@@ -65,6 +67,7 @@ void init_simulation(System* sys)
 {
 	update_accelerations(sys, 0); // set up initial accelerations
 }
+/* simulate the system with the parameters specified in sys and write output to outfile */
 void simulate(FILE* outfile, System* sys)
 {
 	long long nsteps = sys->nsteps;
@@ -72,7 +75,6 @@ void simulate(FILE* outfile, System* sys)
 
 	for(int i = 0; i < nsteps; i++)
 	{
-		// Print the simulation state if necessary
 		if(i % print_period == 0)
 		{
 			sys->cur_step = i;

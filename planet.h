@@ -19,7 +19,7 @@ typedef struct System
 	int nplanets;
 	long long cur_step;
 	long long nsteps;
-	long long print_period; // print system state every N time steps
+	long long print_period; // print system state every print_period time steps
 	Planet planets[];
 } System;
 
