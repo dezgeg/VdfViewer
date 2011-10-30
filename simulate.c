@@ -82,4 +82,6 @@ void simulate(FILE* outfile, System* sys)
 		}
 		simulate_one_step(sys, i, sys->time_step);
 	}
+	sys->cur_step = nsteps;
+	print_system(outfile, sys);
 }
