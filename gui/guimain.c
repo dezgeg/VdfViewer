@@ -25,61 +25,22 @@ void init_viewport(void)
 
 	glMatrixMode(GL_MODELVIEW);
 }
+
 static void die(const char* message)
 {
 	fprintf(stderr, "%s: %s\n", message, SDL_GetError());
 	exit(1);
 }
-static void usage(const char* progname)
-{
-	fprintf(stderr, "usage: %s infile\n", progname);
-	exit(EXIT_FAILURE);
-}
-static void update_trails(void)
-{
-	int trail_index = (state.first_trail + state.num_trails) % MAX_TRAILS;
-	for(int i = 0; i < state.sys->nplanets; i++)
-		vector_copy(state.views[i].trails[trail_index], state.sys->planets[i].position);
-
-	if(state.num_trails == MAX_TRAILS)
-		state.first_trail++;
-	else
-		state.num_trails++;
-}
 
 int main(int argc, char** argv)
 {
-	if(argc != 2)
-		usage(argv[0]);
+	memset(&state.pos, 0, sizeof(state.pos));
 
-	FILE* infile = fopen(argv[1], "r");
-	if(infile == NULL)
-	{
-		perror("Error opening input file");
-		return EXIT_FAILURE;
-	}
-	System* sys = load_system(infile);
-	if(sys == NULL)
-	{
-		printf("Loading input file failed\n");
-		return EXIT_FAILURE;
-	}
-	init_simulation(sys);
-	state.sys = sys;
-	state.views = malloc(sys->nplanets * sizeof(PlanetView));
-	for(int i = 0; i < sys->nplanets; i++)
-		state.views[i].radius = pow(sys->planets[i].mass / DENSITY_FACTOR, 1.0f/3.0f);
-	state.scale = 1.0f;
-	Vector* fst_pos = &sys->planets[0].position;
-	vector_copy(state.pos, *fst_pos);
-	state.pos[1] += 1.1f*get_planet_radius(0);
-	state.pos[0] -= get_planet_radius(0);
-	state.rot_x = 90.0f;
-	state.locked_planet = -1;
-	state.hours_per_sec = DEFAULT_SIMULATION_SPEED;
-	state.time_step = sys->time_step;
-	state.paused = true;
-	state.trails_enabled = true;
+	state.pos[0] = 43049760.000000;
+	state.pos[1] = 42958296.000000;
+	state.pos[2] = 107656760.000000;
+	state.rot_x = 333.299713f;
+	state.rot_y = 24.149984f;
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 		die("SDL initialization failed");
@@ -113,7 +74,6 @@ int main(int argc, char** argv)
 		;  /* ignore spurious mouse events at startup */
 
 	bool window_is_active = true;
-	int step = 0;
 	while (true)
 	{
 		Uint32 next_update = SDL_GetTicks() + FRAME_INTERVAL;
@@ -123,7 +83,7 @@ int main(int argc, char** argv)
 			{
 				case SDL_ACTIVEEVENT:
 					window_is_active = event.active.gain;
-					break;			    
+					break;
 				case SDL_VIDEORESIZE:
 					surface = SDL_SetVideoMode(event.resize.w,
 							event.resize.h,
@@ -150,15 +110,7 @@ int main(int argc, char** argv)
 			draw_scene();
 			glFlush();
 			SDL_GL_SwapBuffers();
-		}
-		if(!state.paused)
-		{
-			for(int i = 0; i < (state.hours_per_sec * 3600.0f / FRAME_INTERVAL) / state.time_step; i++)
-			{
-				if((step % TRAILS_INTERVAL) == 0)
-					update_trails();
-				simulate_one_step(sys, step++, state.time_step);
-			}
+		        // printf("%f %f %f, %f %f\n", state.pos[0], state.pos[1], state.pos[2], state.rot_x, state.rot_y);
 		}
 		Sint32 delta = next_update - SDL_GetTicks();
 		if(delta > 0)

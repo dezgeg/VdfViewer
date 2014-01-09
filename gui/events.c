@@ -21,6 +21,7 @@ static GLfloat get_modifier_value(GLfloat shift_val, GLfloat normal_val, GLfloat
 	else
 		return shift_val;
 }
+
 static void modify_setting(const char* name, GLfloat* setting, bool increment)
 {
 	*setting += (increment ? 1.0f : -1.0f) * get_modifier_value(0.1f, 1.0f, 10.0f);
@@ -28,14 +29,7 @@ static void modify_setting(const char* name, GLfloat* setting, bool increment)
 		*setting = 0.0f;
 	printf("%s: %g\n", name, *setting);
 }
-static void unlock_planet(void)
-{
-	if(state.locked_planet >= 0)
-	{
-		vector_add(state.pos, state.pos, state.sys->planets[state.locked_planet].position);
-		state.locked_planet = -1;
-	}
-}
+
 void handle_keypress(const SDL_keysym *keysym)
 {
 	switch (keysym->sym)
@@ -43,44 +37,10 @@ void handle_keypress(const SDL_keysym *keysym)
 		case SDLK_ESCAPE:
 			exit(0);
 			break;
-		case SDLK_p:
-			state.paused = !state.paused;
-			printf("Simulation %s\n", state.paused ? "paused" : "unpaused");
-			break;
-		case SDLK_t:
-			state.trails_enabled = !state.trails_enabled;
-			printf("Trails %s\n", state.trails_enabled ? "enabled" : "disabled");
-			break;
-		case SDLK_r:
-			state.first_trail = 0;
-			state.num_trails = 0;
-			printf("Trails cleared\n");
-			break;
 		case SDLK_F1:
 		case SDLK_F2:
 			modify_setting("Planet scale", &state.scale, keysym->sym == SDLK_F1);
 			break;
-		case SDLK_F3:
-		case SDLK_F4:
-			modify_setting("Simulation speed (earth hours/sec)", &state.hours_per_sec, keysym->sym == SDLK_F3);
-			break;
-		case SDLK_0:
-			unlock_planet();
-			printf("Movement set to free-moving\n");
-			break;
-		case SDLK_TAB:
-			{
-				int planet = state.locked_planet;
-				if(planet == -1)
-				{
-					planet = 0;
-					vector_copy(state.pos, state.sys->planets[planet].position);
-				}
-				else
-					state.pos[0] = state.pos[1] = state.pos[2] = 0.0f;
-				state.pos[1] += 1.1f * get_planet_radius(planet);
-				break;
-			}
 			/*
 		case SDLK_F12:
 			state.orthographic = !state.orthographic;
@@ -89,16 +49,6 @@ void handle_keypress(const SDL_keysym *keysym)
 			*/
 		default:
 			break;
-	}
-	if(keysym->sym >= SDLK_1 && keysym->sym <= SDLK_9)
-	{
-		int planet = keysym->sym - SDLK_1;
-		if(planet >= state.sys->nplanets)
-			return;
-		unlock_planet();
-		state.locked_planet = planet;
-		vector_sub(state.pos, state.pos, state.sys->planets[planet].position);
-		printf("Movement locked on to planet %d\n", planet + 1);
 	}
 }
 // Rotate the viewport by x, y (in screen coordinates) degrees

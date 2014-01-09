@@ -4,15 +4,9 @@ LINK=gcc
 
 LIBS=-lm
 GUI_LIBS=-lm -lGL -lGLU `sdl-config --cflags --libs`
-EXE=planets
 GUI_EXE=glplanets
 
-COMMON_OBJS=planet.o simulate.o
-OBJS=main.o $(COMMON_OBJS)
-GUI_OBJS=gui/guimain.o gui/events.o gui/draw.o $(COMMON_OBJS)
-
-$(EXE): $(OBJS)
-	$(LINK) -o $(EXE) $(OBJS) $(LIBS)
+GUI_OBJS=gui/guimain.o gui/events.o gui/draw.o
 
 $(GUI_EXE): $(GUI_OBJS)
 	$(LINK) $(GUI_OBJS) -o $(GUI_EXE) $(GUI_LIBS) 
