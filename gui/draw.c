@@ -49,24 +49,32 @@ void draw_scene(void)
 
 	glTranslatef(-pos_tmp[0], -pos_tmp[1], -pos_tmp[2]);
 	glPushMatrix();
-	for(int i = 0; i < 0; i++)
+
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glEnable(GL_LIGHTING);
+        // glTranslatef(planet->position[0], planet->position[1], planet->position[2]);
+        //glScalef(state.scale, state.scale, state.scale);
+        //gluSphere(sphere, 100000000.0, 32, 32);
+	for(int i = 1; i <= state.numFaces; i++)
 	{
-		// glColor3fv(get_planet_color(i));
-		// glTranslatef(planet->position[0], planet->position[1], planet->position[2]);
-		// glScalef(state.scale, state.scale, state.scale);
+                Vector v1, v2;
+                vector_sub(v1, state.vertexes[state.faces[i][1]], state.vertexes[state.faces[i][0]]);
+                vector_sub(v2, state.vertexes[state.faces[i][2]], state.vertexes[state.faces[i][0]]);
+                Vector cross;
+                vector_cross(cross, v1, v2);
+                Vector norm;
+                vector_normalize(norm, cross);
+                printf("%f %f %f\n", norm[0], norm[1], norm[2]);
 
-		glDisable(GL_LIGHTING);
-		glBegin(GL_POINTS);
-		glVertex3f(0.0f, 0.0f, 0.0f);
-		glEnd();
-
-		glEnable(GL_LIGHTING);
-		// gluSphere(sphere, get_planet_radius(i), 32, 32);
-
-		glPopMatrix();
-		glPushMatrix();
+                glBegin(GL_TRIANGLES);
+                glNormal3fv(norm);
+                glVertex3fv(state.vertexes[state.faces[i][0]]);
+                glVertex3fv(state.vertexes[state.faces[i][1]]);
+                glVertex3fv(state.vertexes[state.faces[i][2]]);
+                glEnd();
 	}
-	glDisable(GL_LIGHTING);
+
+        glDisable(GL_LIGHTING);
 	draw_grid();
 	glPopMatrix();
 }

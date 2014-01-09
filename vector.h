@@ -32,15 +32,24 @@ static inline void vector_sub(Vector dest, const Vector v1, const Vector v2)
 	for(int i = 0; i < 3; i++)
 		dest[i] = v1[i] - v2[i];
 }
+
 static inline void vector_copy(Vector dest, const Vector src)
 {
 	memcpy(dest, src, sizeof(Vector));
 }
+
 static inline void vector_normalize(Vector dest, const Vector vec)
 {
 	Float length = sqrt(vector_lengthsq(vec));
 	for(int i = 0; i < 3; i++)
 		dest[i] = vec[i] / length;
+}
+
+static inline void vector_cross(Vector dest, const Vector a, const Vector b)
+{
+    dest[0] = a[1] * b[2] - b[1] * a[2];
+    dest[1] = a[2] * b[0] - b[2] * a[0];
+    dest[2] = a[0] * b[1] - b[1] * a[0];
 }
 
 #endif

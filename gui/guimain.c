@@ -32,15 +32,49 @@ static void die(const char* message)
 	exit(1);
 }
 
+static void read_model(void)
+{
+        int vertexIndex = 1;
+        int faceIndex = 1;
+        while (true) {
+                char linebuf[1024];
+                linebuf[0] = '\0';
+                fgets(linebuf, sizeof(linebuf), stdin);
+                if (linebuf[0] == '\0')
+                        break;
+
+                printf("%s", linebuf);
+                char word[64];
+                sscanf(linebuf, "%s", word);
+                if (!strcmp(word, "v")) {
+                        Vector v;
+                        sscanf(linebuf, "%s %f %f %f", word, &v[0], &v[1], &v[2]);
+                        memcpy(&state.vertexes[vertexIndex], &v, sizeof(v));
+                        vertexIndex++;
+                } else if (!strcmp(word, "f")) {
+                        int f[3];
+                        sscanf(linebuf, "%s %d %d %d", word, &f[0], &f[1], &f[2]);
+                        memcpy(&state.faces[faceIndex][0], &f, 3 * sizeof(int));
+                        faceIndex++;
+                } else if (!strcmp(word, "usemtl")) {
+
+                } else if (!strcmp(word, "mtllib")) {
+
+                }
+        }
+        state.numFaces = faceIndex - 1;
+        printf("done\n");
+}
+
 int main(int argc, char** argv)
 {
-	memset(&state.pos, 0, sizeof(state.pos));
-
-	state.pos[0] = 43049760.000000;
-	state.pos[1] = 42958296.000000;
-	state.pos[2] = 107656760.000000;
+	read_model();
+	state.pos[0] = 4.3049760000000;
+	state.pos[1] = 4.2958296000000;
+	state.pos[2] = 1.07656760000000;
 	state.rot_x = 333.299713f;
 	state.rot_y = 24.149984f;
+	state.scale = 1.0f;
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 		die("SDL initialization failed");
