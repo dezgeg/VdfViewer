@@ -32,14 +32,53 @@ static void die(const char* message)
 	exit(1);
 }
 
-static void read_model(void)
+typedef struct PsxFixed
+{
+	union {
+		struct {
+			unsigned sign : 1;
+			unsigned integral : 3;
+			unsigned fractional : 12;
+		};
+		unsigned short bits;
+	};
+} PsxFixed;
+
+static inline GLfloat to_float(PsxFixed psxf)
+{
+	bool neg = false;
+	if (psxf.sign) {
+		psxf.bits = -psxf.bits;
+	}
+	GLfloat f = psxf.integral + (double)psxf.fractional / 0xFFF;
+	if (neg)
+		f = -f;
+	return f;
+}
+
+static const char* dump(PsxFixed f)
+{
+	static char buf[64][64];
+	static int bufptr;
+
+	bufptr = (bufptr + 1) % 64;
+	snprintf(&buf[bufptr][0], 64, "(%c%08x.%08x)", f.sign ? '-' : '+', f.integral, f.fractional);
+	return &buf[bufptr][0];
+}
+
+typedef struct PsxVector
+{
+	PsxFixed x, y, z, pad;
+} PsxVector;
+
+static void read_model(FILE* fp)
 {
         int vertexIndex = 1;
         int faceIndex = 1;
         while (true) {
                 char linebuf[1024];
                 linebuf[0] = '\0';
-                fgets(linebuf, sizeof(linebuf), stdin);
+                fgets(linebuf, sizeof(linebuf), fp);
                 if (linebuf[0] == '\0')
                         break;
 
@@ -65,19 +104,68 @@ static void read_model(void)
 
                 }
         }
+        state.numVertexes = vertexIndex - 1;
         state.numFaces = faceIndex - 1;
         printf("done\n");
 }
 
+static void read_anims(FILE* fp)
+{
+	unsigned buf[20000];
+	fread(&buf, sizeof(buf), 1, fp);
+
+	unsigned* ptr = buf;
+	unsigned objtotal = *ptr++;
+	printf("objtotal: %u\n", objtotal);
+
+	ptr++;
+	for(unsigned i = 0; i < objtotal; i++) {
+		unsigned offset = *ptr++; // assume this is always 0
+		unsigned total = *ptr++;
+		(void) offset, (void) total;
+
+		printf("Convert %u off=%ld\n", i, 4 * (long)(ptr - buf));
+		PsxVector* array = (PsxVector*) ptr;
+		for(unsigned j = 0; j < total; j++) {
+			state.anims[i][j + 1][0] = to_float(array[j].x);
+			state.anims[i][j + 1][1] = to_float(array[j].y);
+			state.anims[i][j + 1][2] = to_float(array[j].z);
+			printf("    %2u/%3u: %s%f %s%f %s%f\n", i, j + 1,
+					dump(array[j].x), to_float(array[j].x),
+					dump(array[j].y), to_float(array[j].y),
+					dump(array[j].z), to_float(array[j].z));
+		}
+
+		ptr += total * 2;
+		ptr++;
+	}
+	state.numAnims = objtotal;
+}
+
 int main(int argc, char** argv)
 {
-	read_model();
-	state.pos[0] = 4.3049760000000;
-	state.pos[1] = 4.2958296000000;
-	state.pos[2] = 1.07656760000000;
-	state.rot_x = 333.299713f;
-	state.rot_y = 24.149984f;
+	if (argc < 3)
+		die("args");
+	FILE* model = fopen(argv[1], "r");
+	if (!model)
+		die("Can't open model");
+	read_model(model);
+	fclose(model);
+
+	FILE* anims = fopen(argv[2], "r");
+	if (!anims)
+		die("Can't open anims");
+	read_anims(anims);
+	fclose(anims);
+
+	state.pos[0] = 1.169238;
+	state.pos[1] = 26.488846;
+	state.pos[2] = -21.112965;
+	state.rot_x = 182.249313;
+	state.rot_y = 34.499950;
 	state.scale = 1.0f;
+	state.animIndex = 1;
+	state.animLerp = 0.0f;
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 		die("SDL initialization failed");
@@ -85,7 +173,7 @@ int main(int argc, char** argv)
 	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
 	if(!videoInfo)
 		die("Could not get video information");
-	int videoFlags = SDL_OPENGL | SDL_HWPALETTE | SDL_RESIZABLE | SDL_HWSURFACE | SDL_HWACCEL;
+	int videoFlags = SDL_OPENGL | SDL_HWPALETTE | SDL_RESIZABLE | SDL_HWSURFACE | SDL_HWACCEL | SDL_RESIZABLE;
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);

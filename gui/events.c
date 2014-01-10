@@ -37,10 +37,32 @@ void handle_keypress(const SDL_keysym *keysym)
 		case SDLK_ESCAPE:
 			exit(0);
 			break;
+
 		case SDLK_F1:
 		case SDLK_F2:
-			modify_setting("Planet scale", &state.scale, keysym->sym == SDLK_F1);
+			modify_setting("Scale", &state.scale, keysym->sym == SDLK_F1);
 			break;
+
+		case SDLK_F3:
+		case SDLK_F4:
+			modify_setting("Animation lerp", &state.animLerp, keysym->sym == SDLK_F3);
+			break;
+
+		case SDLK_F5:
+			if (state.animIndex == 1)
+				state.animIndex = state.numAnims;
+			else
+				state.animIndex--;
+			printf("Anim index: %d\n", state.animIndex);
+			break;
+		case SDLK_F6:
+			if (state.animIndex == state.numAnims)
+				state.animIndex = 1;
+			else
+				state.animIndex++;
+			printf("Anim index: %d\n", state.animIndex);
+			break;
+
 			/*
 		case SDLK_F12:
 			state.orthographic = !state.orthographic;

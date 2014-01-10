@@ -63,15 +63,22 @@ void draw_scene(void)
                 vector_cross(cross, v1, v2);
                 Vector norm;
                 vector_normalize(norm, cross);
-                printf("%f %f %f\n", norm[0], norm[1], norm[2]);
 
                 glBegin(GL_TRIANGLES);
                 glColor3fv(state.colors[i]);
                 glNormal3fv(norm);
-                glVertex3fv(state.vertexes[state.faces[i][0]]);
-                glVertex3fv(state.vertexes[state.faces[i][1]]);
-                glVertex3fv(state.vertexes[state.faces[i][2]]);
-                glEnd();
+
+                Vector vertexes[3];
+
+		for (unsigned j = 0; j < 3; j++) {
+			unsigned vertexIndex = state.faces[i][j];
+
+			Vector tmp;
+			vector_mul(tmp, state.animLerp / 100.0, state.anims[state.animIndex][vertexIndex]);
+			vector_add(vertexes[j], state.vertexes[vertexIndex], tmp);
+			glVertex3fv(vertexes[j]);
+		}
+		glEnd();
 	}
 
         glDisable(GL_LIGHTING);

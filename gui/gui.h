@@ -16,10 +16,18 @@ typedef struct GuiState
 	GLfloat rot_x, rot_y; /* rotation along screen x & y == world x & y */
 	GLfloat scale;
 
-	int numFaces;
+	int numVertexes;
 	Vector vertexes[1024];
 	Vector colors[1024];
+
+	int numFaces;
 	int faces[1024][3];
+
+	int numAnims;
+	Vector anims[1024][1024];
+
+	int animIndex;
+	GLfloat animLerp;
 } GuiState;
 
 // events.c
