@@ -57,7 +57,10 @@ static void read_model(void)
                         memcpy(&state.faces[faceIndex][0], &f, 3 * sizeof(int));
                         faceIndex++;
                 } else if (!strcmp(word, "usemtl")) {
-
+                        int r, g, b, a;
+                        sscanf(linebuf, "%s r%dg%db%da%d", word, &r, &g, &b, &a);
+                        Vector v = { r/255.0, g/255.0, b/255.0 };
+                        memcpy(&state.colors[faceIndex], &v, sizeof(v));
                 } else if (!strcmp(word, "mtllib")) {
 
                 }

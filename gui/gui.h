@@ -18,6 +18,7 @@ typedef struct GuiState
 
 	int numFaces;
 	Vector vertexes[1024];
+	Vector colors[1024];
 	int faces[1024][3];
 } GuiState;
 

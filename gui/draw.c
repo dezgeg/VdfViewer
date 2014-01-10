@@ -50,7 +50,6 @@ void draw_scene(void)
 	glTranslatef(-pos_tmp[0], -pos_tmp[1], -pos_tmp[2]);
 	glPushMatrix();
 
-        glColor3f(1.0f, 0.0f, 0.0f);
         glEnable(GL_LIGHTING);
         // glTranslatef(planet->position[0], planet->position[1], planet->position[2]);
         //glScalef(state.scale, state.scale, state.scale);
@@ -67,6 +66,7 @@ void draw_scene(void)
                 printf("%f %f %f\n", norm[0], norm[1], norm[2]);
 
                 glBegin(GL_TRIANGLES);
+                glColor3fv(state.colors[i]);
                 glNormal3fv(norm);
                 glVertex3fv(state.vertexes[state.faces[i][0]]);
                 glVertex3fv(state.vertexes[state.faces[i][1]]);
