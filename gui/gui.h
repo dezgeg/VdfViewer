@@ -15,6 +15,7 @@ typedef struct GuiState
 	Vector pos;
 	GLfloat rot_x, rot_y; /* rotation along screen x & y == world x & y */
 	GLfloat scale;
+	int frame;
 
 	int numVertexes;
 	Vector vertexes[1024];

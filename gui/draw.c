@@ -72,9 +72,10 @@ void draw_scene(void)
 
 		for (unsigned j = 0; j < 3; j++) {
 			unsigned vertexIndex = state.faces[i][j];
+			float maxLerp = fmod(state.frame, state.animLerp + 1);
 
 			Vector tmp;
-			vector_mul(tmp, state.animLerp, state.anims[state.animIndex][vertexIndex]);
+			vector_mul(tmp, maxLerp, state.anims[state.animIndex][vertexIndex]);
 			vector_sub(vertexes[j], state.vertexes[vertexIndex], tmp);
 			glVertex3fv(vertexes[j]);
 		}
@@ -84,6 +85,7 @@ void draw_scene(void)
         glDisable(GL_LIGHTING);
 	draw_grid();
 	glPopMatrix();
+	state.frame++;
 }
 
 void init_gl(void)

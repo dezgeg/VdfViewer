@@ -32,36 +32,36 @@ static void die(const char* message)
 	exit(1);
 }
 
-typedef struct PsxFixed
+typedef union __attribute__((packed)) PsxFixed
 {
-	union {
-		struct {
-			unsigned fractional : 12;
-			unsigned integral : 3;
-			unsigned sign : 1;
-		};
-		short bits;
+	struct {
+		unsigned fractional : 12;
+		unsigned integral : 3;
+		unsigned sign : 1;
 	};
+	short bits;
 } PsxFixed;
 
-static inline GLfloat to_float(PsxFixed psxf)
+static inline GLfloat to_float(uint16_t b)
 {
-	return psxf.bits / 4096.0;
+	return (int16_t)b / 4096.0;
 }
 
-static const char* dump(PsxFixed f)
+static const char* dump(uint16_t b)
 {
+	PsxFixed f;
 	static char buf[64][64];
 	static int bufptr;
 
+	f.bits = b;
 	bufptr = (bufptr + 1) % 64;
 	snprintf(&buf[bufptr][0], 64, "(%c%01x.%03x)", f.sign ? '-' : '+', f.integral, f.fractional);
 	return &buf[bufptr][0];
 }
 
-typedef struct PsxVector
+typedef struct __attribute__((packed)) PsxVector
 {
-	PsxFixed x, y, z, pad;
+	uint16_t x, y, z, pad;
 } PsxVector;
 
 static void read_model(FILE* fp)
@@ -104,35 +104,39 @@ static void read_model(FILE* fp)
 
 static void read_anims(FILE* fp)
 {
-	unsigned buf[20000];
+	uint32_t buf[20000];
 	fread(&buf, sizeof(buf), 1, fp);
 
-	unsigned* ptr = buf;
-	unsigned objtotal = *ptr++;
-	printf("objtotal: %u\n", objtotal);
+	uint32_t* ptr = buf;
+	uint32_t objtotal = *ptr++;
+	printf("objtotal: %u, sizeof(Vector) = %zu, sizeof(Fixed) = %zu\n",
+		objtotal, sizeof(PsxVector), sizeof(PsxFixed));
 
 	ptr++;
 	for(unsigned i = 0; i < objtotal; i++) {
-		unsigned offset = *ptr++; // assume this is always 0
-		unsigned total = *ptr++;
+		uint32_t offset = *ptr++; // assume this is always 0
+		uint32_t total = *ptr++;
 		(void) offset, (void) total;
 
-		printf("Convert %u off=%ld\n", i, 4 * (long)(ptr - buf));
+		printf("Convert %u array off=0x%lx\n", i, 4 * (long)(ptr - buf));
 		PsxVector* array = (PsxVector*) ptr;
 		for(unsigned j = 0; j < total; j++) {
 			state.anims[i + 1][j + 1][0] = to_float(array[j].x);
 			state.anims[i + 1][j + 1][1] = to_float(array[j].y);
 			state.anims[i + 1][j + 1][2] = to_float(array[j].z);
-			printf("    %2u/%3u: %s:%f %s:%f %s:%f\n", i, j + 1,
+			printf("    %2u/%3u: %s:%+f %s:%+f %s:%+f (0x%04hx 0x%04hx 0x%04hx 0x%04hx)\n",
+					i, j + 1,
 					dump(array[j].x), to_float(array[j].x),
 					dump(array[j].y), to_float(array[j].y),
-					dump(array[j].z), to_float(array[j].z));
+					dump(array[j].z), to_float(array[j].z),
+					array[j].x, array[j].y, array[j].z, array[j].pad);
 		}
 
 		ptr += total * 2;
 		ptr++;
 	}
 	state.numAnims = objtotal;
+        printf("EOF at 0x%lx\n", 4 * (long)(ptr - buf));
 }
 
 int main(int argc, char** argv)
