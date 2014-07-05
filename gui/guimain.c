@@ -34,12 +34,12 @@ static void die(const char* message)
 
 typedef union __attribute__((packed)) PsxFixed
 {
-	struct {
+	struct __attribute__((packed)) {
 		unsigned fractional : 12;
 		unsigned integral : 3;
 		unsigned sign : 1;
 	};
-	short bits;
+	int16_t bits;
 } PsxFixed;
 
 static inline GLfloat to_float(uint16_t b)
@@ -112,8 +112,8 @@ static void read_anims(FILE* fp)
 	printf("objtotal: %u, sizeof(Vector) = %zu, sizeof(Fixed) = %zu\n",
 		objtotal, sizeof(PsxVector), sizeof(PsxFixed));
 
-	ptr++;
 	for(unsigned i = 0; i < objtotal; i++) {
+		ptr++;
 		uint32_t offset = *ptr++; // assume this is always 0
 		uint32_t total = *ptr++;
 		(void) offset, (void) total;
@@ -133,7 +133,6 @@ static void read_anims(FILE* fp)
 		}
 
 		ptr += total * 2;
-		ptr++;
 	}
 	state.numAnims = objtotal;
         printf("EOF at 0x%lx\n", 4 * (long)(ptr - buf));
