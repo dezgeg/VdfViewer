@@ -74,8 +74,8 @@ void draw_scene(void)
 			unsigned vertexIndex = state.faces[i][j];
 
 			Vector tmp;
-			vector_mul(tmp, state.animLerp / 100.0, state.anims[state.animIndex][vertexIndex]);
-			vector_add(vertexes[j], state.vertexes[vertexIndex], tmp);
+			vector_mul(tmp, state.animLerp, state.anims[state.animIndex][vertexIndex]);
+			vector_sub(vertexes[j], state.vertexes[vertexIndex], tmp);
 			glVertex3fv(vertexes[j]);
 		}
 		glEnd();

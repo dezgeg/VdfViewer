@@ -36,24 +36,17 @@ typedef struct PsxFixed
 {
 	union {
 		struct {
-			unsigned sign : 1;
-			unsigned integral : 3;
 			unsigned fractional : 12;
+			unsigned integral : 3;
+			unsigned sign : 1;
 		};
-		unsigned short bits;
+		short bits;
 	};
 } PsxFixed;
 
 static inline GLfloat to_float(PsxFixed psxf)
 {
-	bool neg = false;
-	if (psxf.sign) {
-		psxf.bits = -psxf.bits;
-	}
-	GLfloat f = psxf.integral + (double)psxf.fractional / 0xFFF;
-	if (neg)
-		f = -f;
-	return f;
+	return psxf.bits / 4096.0;
 }
 
 static const char* dump(PsxFixed f)
@@ -62,7 +55,7 @@ static const char* dump(PsxFixed f)
 	static int bufptr;
 
 	bufptr = (bufptr + 1) % 64;
-	snprintf(&buf[bufptr][0], 64, "(%c%08x.%08x)", f.sign ? '-' : '+', f.integral, f.fractional);
+	snprintf(&buf[bufptr][0], 64, "(%c%01x.%03x)", f.sign ? '-' : '+', f.integral, f.fractional);
 	return &buf[bufptr][0];
 }
 
@@ -82,7 +75,7 @@ static void read_model(FILE* fp)
                 if (linebuf[0] == '\0')
                         break;
 
-                printf("%s", linebuf);
+                //printf("%s", linebuf);
                 char word[64];
                 sscanf(linebuf, "%s", word);
                 if (!strcmp(word, "v")) {
@@ -127,10 +120,10 @@ static void read_anims(FILE* fp)
 		printf("Convert %u off=%ld\n", i, 4 * (long)(ptr - buf));
 		PsxVector* array = (PsxVector*) ptr;
 		for(unsigned j = 0; j < total; j++) {
-			state.anims[i][j + 1][0] = to_float(array[j].x);
-			state.anims[i][j + 1][1] = to_float(array[j].y);
-			state.anims[i][j + 1][2] = to_float(array[j].z);
-			printf("    %2u/%3u: %s%f %s%f %s%f\n", i, j + 1,
+			state.anims[i + 1][j + 1][0] = to_float(array[j].x);
+			state.anims[i + 1][j + 1][1] = to_float(array[j].y);
+			state.anims[i + 1][j + 1][2] = to_float(array[j].z);
+			printf("    %2u/%3u: %s:%f %s:%f %s:%f\n", i, j + 1,
 					dump(array[j].x), to_float(array[j].x),
 					dump(array[j].y), to_float(array[j].y),
 					dump(array[j].z), to_float(array[j].z));
