@@ -5,7 +5,7 @@
 #define SCREEN_WIDTH  640
 #define SCREEN_HEIGHT 480
 #define SCREEN_BPP     16
-#define FRAME_INTERVAL 30
+#define FRAME_INTERVAL 17
 
 #define FOV 45.0f
 #define NEAR_PLANE 1.0f
