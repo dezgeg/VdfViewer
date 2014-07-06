@@ -113,12 +113,13 @@ static void read_anims(FILE* fp)
 		objtotal, sizeof(PsxVector), sizeof(PsxFixed));
 
 	for(unsigned i = 0; i < objtotal; i++) {
-		ptr++;
+		uint32_t objnum = *ptr++;
 		uint32_t offset = *ptr++; // assume this is always 0
 		uint32_t total = *ptr++;
 		(void) offset, (void) total;
 
-		printf("Convert %u array off=0x%lx\n", i, 4 * (long)(ptr - buf));
+		printf("Convert %u: objnum=%d offset=%d total=%d array=0x%lx\n",
+		        i, objnum, offset, total, 4 * (long)(ptr - buf));
 		PsxVector* array = (PsxVector*) ptr;
 		for(unsigned j = 0; j < total; j++) {
 			state.anims[i + 1][j + 1][0] = to_float(array[j].x);
