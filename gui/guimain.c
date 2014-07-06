@@ -42,11 +42,6 @@ typedef union __attribute__((packed)) PsxFixed
 	int16_t bits;
 } PsxFixed;
 
-static inline GLfloat to_float(uint16_t b)
-{
-	return (int16_t)b / 4096.0;
-}
-
 static const char* dump(uint16_t b)
 {
 	PsxFixed f;
@@ -155,11 +150,12 @@ int main(int argc, char** argv)
 	read_anims(anims);
 	fclose(anims);
 
-	state.pos[0] = 1.169238;
-	state.pos[1] = 26.488846;
-	state.pos[2] = -21.112965;
-	state.rot_x = 182.249313;
-	state.rot_y = 34.499950;
+	state.pos[0] = 0.381673;
+	state.pos[1] = 0.41958;
+	state.pos[2] = -1.128275;
+	state.rot_x = 199.099411;
+	state.rot_y = 16.149929;
+
 	state.scale = 1.0f;
 	state.animIndex = 1;
 	state.animLerp = 0.0f;
@@ -232,7 +228,7 @@ int main(int argc, char** argv)
 			draw_scene();
 			glFlush();
 			SDL_GL_SwapBuffers();
-		        // printf("%f %f %f, %f %f\n", state.pos[0], state.pos[1], state.pos[2], state.rot_x, state.rot_y);
+		        printf("%f %f %f, %f %f\n", state.pos[0], state.pos[1], state.pos[2], state.rot_x, state.rot_y);
 		}
 		Sint32 delta = next_update - SDL_GetTicks();
 		if(delta > 0)

@@ -8,15 +8,15 @@
 #define FRAME_INTERVAL 17
 
 #define FOV 45.0f
-#define NEAR_PLANE 1.0f
-#define FAR_PLANE 1.0e3f
+#define NEAR_PLANE 1.0e-1f
+#define FAR_PLANE 1.0e2f
 #define DENSITY_FACTOR (5.9e24 / pow(6400.0e3f, 3.0f)) // planet's m/r^3, value used for earth
 
 #define FAR_AWAY 1.5e11f // axis endpoint coordinate
 
 #define ROT_DELTA 2.0 // Viewport angle changed by up/down/left/right keys in degress
-#define POS_DELTA 5.0 // Amount moved each frame by the WASD keys
-#define MOUSE_X_DELTA 0.15
-#define MOUSE_Y_DELTA 0.15
+#define POS_DELTA 0.1 // Amount moved each frame by the WASD keys
+#define MOUSE_X_DELTA 0.05
+#define MOUSE_Y_DELTA 0.05
 
 #endif

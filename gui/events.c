@@ -44,8 +44,13 @@ void handle_keypress(const SDL_keysym *keysym)
 			break;
 
 		case SDLK_F3:
+			state.convolution.in = 0x1000;
+			printf("Convolution input: true\n");
+			break;
+
 		case SDLK_F4:
-			modify_setting("Animation lerp", &state.animLerp, keysym->sym == SDLK_F3);
+			state.convolution.in = 0x0000;
+			printf("Convolution input: false\n");
 			break;
 
 		case SDLK_F5:

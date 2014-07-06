@@ -36,6 +36,31 @@ static void draw_grid(void)
 	glEnd();
 }
 
+static const int32_t cnv1[24] = {
+    200, 325, 450, 475, 500, 475, 450, 375,
+    300, 250, 200, 150, 100,  80,  55,   0,
+    -50, -75,-100, -70, -40, -25, -10,  -5,
+};
+
+inline int32_t sane_mod(int32_t a, int32_t b)
+{
+    while (a < b)
+        a += b;
+    return a % b;
+}
+
+void convolute(ConvState* s, int32_t frame)
+{
+    s->ringbuf[frame % CONV_SIZE] = s->in;
+
+    int32_t out = 0;
+    for(int j = 0; j < CONV_SIZE; j++)
+        out += s->ringbuf[sane_mod(frame - j, CONV_SIZE)] * cnv1[j];
+    s->out = out >> 12;
+
+    printf("Frame %d out: 0x%08x (== %f)\n", frame, s->out, to_float(s->out));
+}
+
 void draw_scene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -49,6 +74,9 @@ void draw_scene(void)
 
 	glTranslatef(-pos_tmp[0], -pos_tmp[1], -pos_tmp[2]);
 	glPushMatrix();
+	glRotatef(180.0, 0.0, 0.0, 1.0); // it's upside down for some reason...
+
+        convolute(&state.convolution, state.frame);
 
         glEnable(GL_LIGHTING);
         // glTranslatef(planet->position[0], planet->position[1], planet->position[2]);
@@ -72,7 +100,8 @@ void draw_scene(void)
 
 		for (unsigned j = 0; j < 3; j++) {
 			unsigned vertexIndex = state.faces[i][j];
-			float maxLerp = fmod(state.frame / 1.0, (state.animLerp + 1.0) / 1.0);
+			// float maxLerp = fmod(state.frame / 1.0, (state.animLerp + 1.0) / 1.0);
+			float maxLerp = to_float(state.convolution.out);
 
 			Vector tmp;
 			vector_mul(tmp, maxLerp, state.anims[state.animIndex][vertexIndex]);
@@ -83,8 +112,8 @@ void draw_scene(void)
 	}
 
         glDisable(GL_LIGHTING);
-	draw_grid();
 	glPopMatrix();
+	draw_grid();
 	state.frame++;
 }
 
