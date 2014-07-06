@@ -72,11 +72,11 @@ void draw_scene(void)
 
 		for (unsigned j = 0; j < 3; j++) {
 			unsigned vertexIndex = state.faces[i][j];
-			float maxLerp = fmod(state.frame, state.animLerp + 1);
+			float maxLerp = fmod(state.frame / 1.0, (state.animLerp + 1.0) / 1.0);
 
 			Vector tmp;
 			vector_mul(tmp, maxLerp, state.anims[state.animIndex][vertexIndex]);
-			vector_sub(vertexes[j], state.vertexes[vertexIndex], tmp);
+			vector_add(vertexes[j], state.vertexes[vertexIndex], tmp);
 			glVertex3fv(vertexes[j]);
 		}
 		glEnd();
